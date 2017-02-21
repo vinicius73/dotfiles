@@ -1,4 +1,5 @@
-source ./commands.fish
+source ~/dotfiles/fish/commands.fish
+source ~/dotfiles/fish/env.fish
 
 figlet "Vinicius Reis";
 # echo -ne "($red)Hoje é:\t\t($cyan)" `date`; echo ""
