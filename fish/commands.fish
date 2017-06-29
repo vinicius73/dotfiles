@@ -80,6 +80,15 @@ function php
   docker run -it --rm -v (pwd):/var/www/app -v $A_COMPOSER_MOUNT -v $A_SSH_PHP_MOUNT ambientum/php:7.0 php $argv
 end
 
+function phps
+  docker run -it --rm -p 3022:3022 -v (pwd):/var/www/app -v $A_COMPOSER_MOUNT -v $A_SSH_PHP_MOUNT ambientum/php:7.0 php $argv
+end
+
+function phpbash
+  docker run -it --rm -p 3022:3022 -v (pwd):/var/www/app -v $A_COMPOSER_MOUNT -v $A_SSH_PHP_MOUNT ambientum/php:7.0 bash $argv
+end
+
+
 
 # Composer
 function composer
