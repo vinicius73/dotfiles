@@ -51,6 +51,7 @@ nc='\e[0m'
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 # ... or force ignoredups and ignorespace
 export HISTCONTROL=ignoreboth
+export VISUAL="subl3"
 
 ##WOOT!
 
@@ -80,12 +81,12 @@ fi
 #------------------------------------------////
 # Prompt:
 #------------------------------------------////
-sh history settings
-export HISTFILESIZE=1000000
-export HISTSIZE=100000
-export HISTCONTROL=ignorespace
-export HISTIGNORE='ls:history:ll'
-export HISTTIMEFORMAT='%F %T '
+# sh history settings
+# export HISTFILESIZE=1000000
+# export HISTSIZE=100000
+# export HISTCONTROL=ignorespace
+# export HISTIGNORE='ls:history:ll'
+# export HISTTIMEFORMAT='%F %T '
 
 
 #------------------------------------------////
@@ -93,7 +94,7 @@ export HISTTIMEFORMAT='%F %T '
 #------------------------------------------////
 
 clear
-echo -e "${LIGHTGRAY}";figlet "Vinicius Reis";
+echo -e "${LIGHTGRAY}"; figlet "Vinicius Reis";
 echo -ne "${red}Hoje é:\t\t${cyan}" `date`; echo ""
 echo -e "${red}Kernel: \t${cyan}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
