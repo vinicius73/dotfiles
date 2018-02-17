@@ -1,12 +1,9 @@
 source ~/dotfiles/fish/commands.fish
 source ~/dotfiles/fish/env.fish
 
-function fish_greeting
-  # figlet "Vinicius Reis"
-  screenfetch -E
-end
+set welcomeFile "$HOME/dotfiles/bash/welcome.sh" 
 
-# echo -ne "($red)Hoje é:\t\t($cyan)" `date`; echo ""
-# echo -e "($red)Kernel: \t($cyan)" `uname -smr`
-# echo -ne "($cyan)";upinfo;echo ""
-# echo -e "($cyan)"; cal -3
+function fish_greeting
+  cal -3
+  bash $welcomeFile
+end
