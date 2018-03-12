@@ -1,13 +1,13 @@
 # https://www.ostechnix.com/install-yaourt-arch-linux/
+# https://aur.archlinux.org/packages/yay-bin/
 
-sudo pacman -S --needed base-devel git wget yajl --noconfirm && \
-yaourt -S sublime-text-dev smartgit telegram-desktop-bin --noconfirm && \
-yaourt -S nodejs npm  yarn --noconfirm && \
-yaourt -S java-environment=8 --noconfirm && \
-yaourt -S android-platform android-sdk android-sdk-platform-tools android-sdk-build-tools gradle --noconfirm && \
-yaourt -S docker docker-compose --noconfirm && \
-yaourt -S ttf-font powerline powerline-fonts fira-code-git ttf-liberation screenfetch figlet --noconfirm && \
-yaourt -S pgadmin3 dbeaver redis-desktop-manager insomnia --noconfirm
+sudo pacman -Sy --needed base-devel git wget yajl --noconfirm && \
+yay -S terminator fish cowsay htop --noconfirm && \
+yay -S sublime-text-dev smartgit telegram-desktop-bin --noconfirm && \
+yay -S nodejs npm yarn --noconfirm && \
+yay -S docker docker-compose --noconfirm && \
+yay -S ttf-font powerline powerline-fonts ttf-fira-code-git ttf-liberation screenfetch figlet --noconfirm && \
+yay -S pgadmin3 dbeaver redis-desktop-manager insomnia --noconfirm
 
 
 # sudo groupadd docker && \
