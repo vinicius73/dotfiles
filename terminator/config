@@ -1,8 +1,8 @@
 [global_config]
-  title_inactive_bg_color = "#37474f"
-  title_inactive_fg_color = "#eceff1"
-  title_transmit_bg_color = "#263238"
-  title_transmit_fg_color = "#eceff1"
+  title_inactive_bg_color = "#666666"
+  title_inactive_fg_color = "#c5c5c5"
+  title_transmit_bg_color = "#1c1c1c"
+  title_transmit_fg_color = "#c5c5c5"
 [keybindings]
 [layouts]
   [[default]]
@@ -16,13 +16,13 @@
 [plugins]
 [profiles]
   [[default]]
-    background_color = "#263238"
-    cursor_color = "#eceff1"
+    background_color = "#1c1c1c"
+    cursor_color = "#c5c5c5"
     custom_command = fish
     exit_action = hold
     font = Liberation Mono 13
-    foreground_color = "#eceff1"
-    palette = "#263238:#ff9800:#8bc34a:#ffc107:#03a9f4:#e91e63:#009688:#cfd8dc:#37474f:#ffa74d:#9ccc65:#ffa000:#81d4fa:#ad1457:#26a69a:#eceff1"
+    foreground_color = "#c5c5c5"
+    palette = "#1c1c1c:#ff005b:#cee318:#ffe755:#048ac7:#833c9f:#0ac1cd:#e5e5e5:#666666:#ff00a0:#ccff00:#ff9f00:#48c6ff:#be67e1:#63e7f0:#f3f3f3"
     scrollback_infinite = True
     scrollback_lines = 6000
     use_custom_command = True
