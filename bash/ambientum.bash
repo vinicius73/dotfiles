@@ -1,12 +1,12 @@
 # where the ambientum cache will live
-set	A_BASE		$HOME/.cache/ambientum
+A_BASE=$HOME/.cache/ambientum
 
 # define specific cache directories
-set	A_CONFIG    $A_BASE/.config
-set	A_CACHE	    $A_BASE/.cache
-set	A_LOCAL	    $A_BASE/.local
-set A_SSH		$HOME/.ssh
-set A_COMPOSER  $A_BASE/.composer
+A_CONFIG=$A_BASE/.config
+A_CACHE=$A_BASE/.cache
+A_LOCAL=$A_BASE/.local
+A_SSH=$HOME/.ssh
+A_COMPOSER=$A_BASE/.composer
 
 # create directories
 mkdir -p $A_CONFIG
@@ -20,46 +20,39 @@ mkdir -p $A_COMPOSER
 ###########################################
 
 # reset permissions
-chown -R (whoami):(id -gn) $A_BASE
+chown -R $(whoami):$(id -gn) $A_BASE
 
 # home directory
-set A_USER_HOME /home/ambientum
-
+A_USER_HOME=/home/ambientum
 
 ####
-# alias for NPM And other node commands
+# Alias for NPM And other node commands
 ####
 
-# node Env
-function n
-	docker run -it --rm -v (pwd):/var/www/app \
+# Node Env
+function n() {
+	docker run -it --rm -v $(pwd):/var/www/app \
 	-v $A_CONFIG:$A_USER_HOME/.config \
 	-v $A_CACHE:$A_USER_HOME/.cache \
 	-v $A_LOCAL:$A_USER_HOME/.local \
 	-v $A_SSH:$A_USER_HOME/.ssh \
-	ambientum/node:9 $argv
-end
+	ambientum/node:9 "$@"
+}
+alias n=n
 
-# php Env
-function p
-	docker run -it --rm -v (pwd):/var/www/app \
+# PHP Env
+function p() {
+	docker run -it --rm -v $(pwd):/var/www/app \
 	-v $A_COMPOSER:$A_USER_HOME/.composer \
 	-v $A_CONFIG:$A_USER_HOME/.config \
 	-v $A_CACHE:$A_USER_HOME/.cache \
 	-v $A_LOCAL:$A_USER_HOME/.local \
 	-v $A_SSH:$A_USER_HOME/.ssh \
-	ambientum/php:7.2 $argv
-end
+	ambientum/php:7.2 "$@"
+}
 
-function php
-  p php $argv
-end
+function php() {
+  p php $@
+}
 
-# elixir
-function iex
-  docker run -it -v $HOME:/root --rm elixir
-end
-
-function elixir
-  docker run -it --rm --name elixir-inst1 -v (pwd):/usr/src/myapp -w /usr/src/myapp elixir elixir $argv
-end
+alias p=p

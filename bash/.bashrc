@@ -55,6 +55,8 @@ export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 export HISTCONTROL=ignoreboth
 export VISUAL="subl3"
 
+source ambientum.sh
+
 ##WOOT!
 
 upinfo ()
@@ -101,3 +103,13 @@ echo -ne "${red}Hoje é:\t\t${cyan}" `date`; echo ""
 echo -e "${red}Kernel: \t${cyan}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
 echo -e "${cyan}"; cal -3
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/27.0.3/:/opt/android-sdk/tools"
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
+export ANDROID_HOME="/opt/android-sdk/"
+
+# set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH 
+# set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/27.0.3/ /opt/android-sdk/tools $PATH
+# set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
+# set -gx ANDROID_HOME /opt/android-sdk/
