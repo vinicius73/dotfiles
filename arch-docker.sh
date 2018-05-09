@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 yay -Sy docker docker-compose --noconfirm
 
 sudo usermod -aG docker $USER  && \
