@@ -104,6 +104,7 @@ echo -e "${red}Kernel: \t${cyan}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
 echo -e "${cyan}"; cal -3
 
+export FONTCONFIG_FILE=/etc/fonts/
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/27.0.3/:/opt/android-sdk/tools"
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
