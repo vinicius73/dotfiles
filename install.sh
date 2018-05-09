@@ -1,8 +1,5 @@
-bash arch-enviroment-setup.sh && \
-ln -s ~/dotfiles/fish/config.fish ~/.config/fish/config.fish && \
-rm -rf ~/.config/terminator && \
-ln -s ~/dotfiles/terminator/ ~/.config/terminator && \
-mv ~/.bashrc ~/.bashrc_original && \
-ln -s ~/dotfiles/bash/.bashrc ~/.bashrc && \
-mkdir ~/bin && \
+#!/usr/bin/env bash
+bash arch-enviroment-setup.sh
+bash arch-packages.sh
+bash arch-docker.sh
 bash install-pokemonsay.sh
