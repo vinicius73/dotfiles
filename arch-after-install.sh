@@ -15,4 +15,7 @@ fish -c "fisher rafaelrinaldi/pure" && \
 
 # https://stackoverflow.com/questions/22475849/node-js-error-enospc/32600959#32600959
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p && \
-echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.d/99-sysctl.conf && sudo sysctl --system
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.d/99-sysctl.conf && sudo sysctl --system && \
+
+# https://github.com/googlei18n/noto-emoji/issues/36#issuecomment-343655365
+sudo cp -f -R -p ./50-noto-color-emoji.conf /etc/fonts/conf.d/50-noto-color-emoji.conf
