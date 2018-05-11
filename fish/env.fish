@@ -11,3 +11,5 @@ if test -d /opt/android-sdk
   set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH
   set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/27.0.3/ /opt/android-sdk/tools $PATH
 end
+
+set -gx SPACEFISH_DIR_TRUNC 0
