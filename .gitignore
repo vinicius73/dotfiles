@@ -1,1 +1,5 @@
 pokemonsay/*
+sublime/Packages/User/*.cache
+sublime/Packages/User/*.last-run
+sublime/Packages/User/*.merged-ca-bundle
+sublime/Packages/User/*.user-ca-bundle
