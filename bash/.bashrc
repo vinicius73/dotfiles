@@ -110,7 +110,11 @@ export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
 export ANDROID_HOME="/opt/android-sdk/"
 
-# set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH 
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+  source /etc/profile.d/vte.sh
+fi
+
+# set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH
 # set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/27.0.3/ /opt/android-sdk/tools $PATH
 # set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
 # set -gx ANDROID_HOME /opt/android-sdk/
