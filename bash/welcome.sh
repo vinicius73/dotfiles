@@ -1,7 +1,8 @@
 dotfiles=$HOME/dotfiles
 pokemon_path=$dotfiles/pokemonsay/cows
 quote_file=$dotfiles/quotes.text
-quote=$(cat $quote_file | shuf -n 1)
+quote=$(cat $quote_file | shuf -n 1 | iconv -f utf8 -t ascii//TRANSLIT)
+
 pokemon_cow=$(find $pokemon_path -name "*.cow" | shuf -n1)
 filename=$(basename "$pokemon_cow")
 pokemon_name="${filename%.*}"
