@@ -6,7 +6,7 @@
 sudo pacman -Sy --needed base-devel git wget yajl --noconfirm  && \
 yaourt -S yay-bin
 yay -S terminator fish fzf cowsay htop --noconfirm  && \
-yay -S smartgit telegram-desktop git-extras --noconfirm  && \
+yay -S smartgit telegram-desktop git-extras ctop-bin gotop-bin --noconfirm  && \
 yay -S sublime-text-dev atom visual-studio-code-bin --noconfirm  && \
 yay -S nodejs npm yarn --noconfirm  && \
 yay -S ttf-font powerline powerline-fonts noto-fonts-emoji ttf-fira-code ttf-liberation screenfetch figlet --noconfirm  && \
