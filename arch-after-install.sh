@@ -9,7 +9,7 @@ sudo chown $USER:users /usr/local/bin/  && \
 sudo chown $USER:users /opt && \
 
 curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher && \
-fish -c "fisher add fzf" && \
+fish -c "fisher add jethrokuan/fzf" && \
 fish -c "fisher add edc/bass" && \
 fish -c "fisher add franciscolourenco/done" && \
 fish -c "fisher add rafaelrinaldi/pure" && \
