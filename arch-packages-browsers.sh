@@ -1,0 +1,1 @@
+yay -S google-chrome opera --noconfirm
