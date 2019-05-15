@@ -1,0 +1,6 @@
+{
+  "autoAdd": false,
+  "issueFormat": "jira",
+  "emojiFormat": "emoji",
+  "signedCommit": false
+}

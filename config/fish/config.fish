@@ -1,5 +1,5 @@
-source ~/dotfiles/fish/commands.fish
-source ~/dotfiles/fish/env.fish
+source ~/dotfiles/config/fish/commands.fish
+source ~/dotfiles/config/fish/env.fish
 
 set welcomeFile "$HOME/dotfiles/bash/welcome.sh" 
 
