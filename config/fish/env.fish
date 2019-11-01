@@ -13,3 +13,7 @@ if test -d /opt/android-sdk
 end
 
 set -gx SPACEFISH_DIR_TRUNC 0
+
+if test -f ~/bin/navi
+  source (navi widget fish)
+end

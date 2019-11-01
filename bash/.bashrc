@@ -114,6 +114,9 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   source /etc/profile.d/vte.sh
 fi
 
+# https://github.com/denisidoro/navi#shell-widget
+[[ -s "~/bin/nav" ]] && source "$(navi widget bash)" # ctrl+g
+
 # set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH
 # set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/27.0.3/ /opt/android-sdk/tools $PATH
 # set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
