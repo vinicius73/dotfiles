@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-yay -S google-chrome opera --noconfirm
+yay -S google-chrome opera --needed --noconfirm
