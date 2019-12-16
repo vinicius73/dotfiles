@@ -48,7 +48,7 @@ function p() {
 	-v $A_CACHE:$A_USER_HOME/.cache \
 	-v $A_LOCAL:$A_USER_HOME/.local \
 	-v $A_SSH:$A_USER_HOME/.ssh \
-	ambientum/php:7.2 "$@"
+	ambientum/php:7.3 "$@"
 }
 
 function php() {
