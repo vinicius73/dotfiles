@@ -117,11 +117,6 @@ fi
 # https://github.com/denisidoro/navi#shell-widget
 [[ -s "~/bin/nav" ]] && source "$(navi widget bash)" # ctrl+g
 
-# set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH
-# set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/27.0.3/ /opt/android-sdk/tools $PATH
-# set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
-# set -gx ANDROID_HOME /opt/android-sdk/
-
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="~/.sdkman"
-[[ -s "~/.sdkman/bin/sdkman-init.sh" ]] && source "~/.sdkman/bin/sdkman-init.sh"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

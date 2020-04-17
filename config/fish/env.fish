@@ -5,7 +5,7 @@ set -gx PATH ~/projects/go/bin $PATH
 set -gx GOPATH ~/projects/go
 
 set -gx ANDROID_HOME /opt/android-sdk/
-set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
+set -gx JAVA_HOME /usr/lib/jvm/java-11-openjdk
 
 if test -d /opt/android-sdk
   set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH
