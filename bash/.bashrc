@@ -18,6 +18,7 @@
 
 export GOPATH=~/projects/go
 export PATH=$PATH:~/bin
+export DOTFILES=$HOME/dotfiles
 
 ##############################################################################
 # 03. Theme/Colors                                                           #
@@ -55,14 +56,21 @@ export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 export HISTCONTROL=ignoreboth
 export VISUAL="subl3"
 
-source ambientum.sh
+# EXTRA
+export FONTCONFIG_FILE=/etc/fonts/
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/27.0.3/:/opt/android-sdk/tools"
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
+export ANDROID_HOME="/opt/android-sdk/"
 
-##WOOT!
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+  source /etc/profile.d/vte.sh
+fi
 
-upinfo ()
-{
-  echo -ne "${green}$HOSTNAME ${red}uptime is ${cyan} \t ";uptime | awk /'up/ {print $3,$4,$5,$6,$7,$8,$9,$10}'
-}
+# https://github.com/denisidoro/navi#shell-widget
+[[ -s "~/bin/nav" ]] && source "$(navi widget bash)" # ctrl+g
+
+source $DOTFILES/bash/ambientum.bash
 
 #------------------------------------------////
 # Some default .bashrc contents:
@@ -97,25 +105,18 @@ fi
 # System Information:
 #------------------------------------------////
 
+
+upinfo ()
+{
+  echo -ne "${green}$HOSTNAME ${red}uptime is ${cyan} \t ";uptime | awk /'up/ {print $3,$4,$5,$6,$7,$8,$9,$10}'
+}
+
 clear
 echo -e "${LIGHTGRAY}"; figlet "Vinicius Reis";
 echo -ne "${red}Hoje é:\t\t${cyan}" `date`; echo ""
 echo -e "${red}Kernel: \t${cyan}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
 echo -e "${cyan}"; cal -3
-
-export FONTCONFIG_FILE=/etc/fonts/
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/27.0.3/:/opt/android-sdk/tools"
-export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
-export ANDROID_HOME="/opt/android-sdk/"
-
-if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-  source /etc/profile.d/vte.sh
-fi
-
-# https://github.com/denisidoro/navi#shell-widget
-[[ -s "~/bin/nav" ]] && source "$(navi widget bash)" # ctrl+g
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
