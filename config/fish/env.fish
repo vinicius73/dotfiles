@@ -5,11 +5,11 @@ set -gx PATH ~/projects/go/bin $PATH
 set -gx GOPATH ~/projects/go
 
 set -gx ANDROID_HOME /opt/android-sdk/
-set -gx JAVA_HOME /usr/lib/jvm/java-11-openjdk
+set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
 
 if test -d /opt/android-sdk
-  set -gx PATH /opt/android-sdk/build-tools/27.0.3/ $PATH
-  set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/27.0.3/ /opt/android-sdk/tools $PATH
+  set -gx PATH /opt/android-sdk/build-tools/30.0.0/ $PATH
+  set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/30.0.0/ /opt/android-sdk/tools $PATH
 end
 
 set -gx SPACEFISH_DIR_TRUNC 0
