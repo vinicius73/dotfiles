@@ -1,0 +1,7 @@
+[alias]
+	vlog = log --graph --date-order --date=relative --pretty=format:\"%C(white)%h: %Cgreen - %an - %Cred %C(cyan)%ar:%Creset%n%s%n\" --color
+[user]
+	name = Vinicius Reis
+	email = luiz.vinicius73@gmail.com
+[pull]
+	rebase = false

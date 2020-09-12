@@ -21,9 +21,8 @@ ln -s ~/dotfiles/bash/.bashrc ~/.bashrc
 # ln -s ~/dotfiles/config/sublime/Packages/User/ ~/.config/sublime-text-3/Packages/User
 
 # git
-git config --global alias.vlog 'log --graph --date-order --date=relative --pretty=format:"%C(white)%h: %Cgreen - %an - %Cred %C(cyan)%ar:%Creset%n%s%n" --color'
-git config --global user.name "Vinicius Reis"
-git config --global user.email "luiz.vinicius73@gmail.com"
+mv ~/.gitconfig ~/.gitconfig_original && \
+ln -s ~/dotfiles/config/.gitconfig ~/.gitconfig
 
 # anothers
 mkdir -p ~/bin
