@@ -8,9 +8,9 @@ ln -s ~/dotfiles/config/fish/config.fish ~/.config/fish/config.fish
 rm -rf ~/.config/terminator && \
 ln -s ~/dotfiles/config/terminator/ ~/.config/terminator
 
-# gitmoji-cli-nodejs
-rm -rf ~/.config/gitmoji-cli-nodejs && \
-ln -s ~/dotfiles/config/gitmoji-cli-nodejs/ ~/.config/gitmoji-cli-nodejs
+# gitmoji-nodejs
+rm -rf ~/.config/gitmoji-nodejs && \
+ln -s ~/dotfiles/config/gitmoji-nodejs/ ~/.config/gitmoji-nodejs
 
 # bash
 mv ~/.bashrc ~/.bashrc_original && \
