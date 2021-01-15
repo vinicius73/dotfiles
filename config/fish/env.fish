@@ -1,8 +1,10 @@
+set -gx DOTFILES $HOME/dotfiles
 set -gx PATH ~/.npm-global/bin ~/.config/yarn/global/node_modules/.bin $PATH
 set -gx PATH ~/bin $PATH
 set -gx PATH ~/projects/go/bin $PATH
 
 set -gx GOPATH ~/projects/go
+set -gx ANSIBLE_NOCOWS 1
 
 set -gx ANDROID_HOME /opt/android-sdk/
 set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
@@ -16,4 +18,8 @@ set -gx SPACEFISH_DIR_TRUNC 0
 
 if test -f ~/bin/navi
   source (navi widget fish)
+end
+
+if test -d $DOTFILES/google-cloud-sdk
+  source $DOTFILES/google-cloud-sdk/path.fish.inc
 end

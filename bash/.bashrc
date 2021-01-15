@@ -19,6 +19,7 @@
 export GOPATH=~/projects/go
 export PATH=$PATH:~/bin
 export DOTFILES=$HOME/dotfiles
+export ANSIBLE_NOCOWS=1
 
 ##############################################################################
 # 03. Theme/Colors                                                           #
@@ -118,6 +119,12 @@ echo -ne "${red}Hoje é:\t\t${cyan}" `date`; echo ""
 echo -e "${red}Kernel: \t${cyan}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
 echo -e "${cyan}"; cal -3
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '${DOTFILES}/google-cloud-sdk/path.bash.inc' ]; then . '${DOTFILES}/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '${DOTFILES}/google-cloud-sdk/completion.bash.inc' ]; then . '${DOTFILES}/google-cloud-sdk/completion.bash.inc'; fi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
