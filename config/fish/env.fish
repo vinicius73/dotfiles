@@ -9,6 +9,12 @@ set -gx ANSIBLE_NOCOWS 1
 set -gx ANDROID_HOME /opt/android-sdk/
 set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
 
+if test -d ~/.rvm/bin
+  set -gx PATH ~/.rvm/bin $PATH
+  source ~/dotfiles/config/fish/rvm.fish
+  rvm default
+end
+
 if test -d /opt/android-sdk
   set -gx PATH /opt/android-sdk/build-tools/30.0.0/ $PATH
   set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/30.0.0/ /opt/android-sdk/tools $PATH

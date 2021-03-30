@@ -64,6 +64,9 @@ export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
 export ANDROID_HOME="/opt/android-sdk/"
 
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   source /etc/profile.d/vte.sh
 fi
@@ -106,7 +109,6 @@ fi
 #------------------------------------------////
 # System Information:
 #------------------------------------------////
-
 
 upinfo ()
 {
