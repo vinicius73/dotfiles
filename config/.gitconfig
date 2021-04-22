@@ -5,3 +5,5 @@
 	email = luiz.vinicius73@gmail.com
 [pull]
 	rebase = false
+[init]
+	defaultBranch = master
