@@ -24,5 +24,8 @@ ln -s ~/dotfiles/bash/.bashrc ~/.bashrc
 mv ~/.gitconfig ~/.gitconfig_original && \
 ln -s ~/dotfiles/config/.gitconfig ~/.gitconfig
 
+if [ -f '~/.terraformrc' ]; then mv ~/.terraformrc ~/.terraformrc_original; fi
+ln -s ~/dotfiles/config/.terraformrc ~/.terraformrc
+
 # anothers
 mkdir -p ~/bin
