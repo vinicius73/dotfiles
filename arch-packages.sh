@@ -9,4 +9,5 @@ yay -S nodejs npm yarn --noconfirm --needed && \
 yay -S gitkraken sublime-text-dev atom visual-studio-code-bin --noconfirm --needed && \
 yay -S telegram-desktop slack-desktop spotify --noconfirm --needed && \
 yay -S ttf-font powerline powerline-fonts noto-fonts-emoji ttf-fira-code ttf-liberation --noconfirm --needed && \
-yay -S dbeaver insomnia libratbag piper --noconfirm  --needed
+yay -S dbeaver insomnia libratbag piper --noconfirm  --needed && \
+yay -S peco ghq micro --noconfirm --needed
