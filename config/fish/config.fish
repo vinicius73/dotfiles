@@ -1,5 +1,8 @@
 source ~/dotfiles/config/fish/commands.fish
 source ~/dotfiles/config/fish/env.fish
+if type -q exa
+  source ~/dotfiles/config/fish/peco.fish
+end
 
 set welcomeFile "$HOME/dotfiles/bash/welcome.sh"
 
