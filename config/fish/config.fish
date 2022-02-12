@@ -1,6 +1,6 @@
 source ~/dotfiles/config/fish/commands.fish
 source ~/dotfiles/config/fish/env.fish
-if type -q exa
+if type -q peco
   source ~/dotfiles/config/fish/peco.fish
 end
 
