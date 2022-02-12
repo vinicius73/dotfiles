@@ -3,6 +3,7 @@
 [user]
 	name = Vinicius Reis
 	email = luiz.vinicius73@gmail.com
+	signingkey = CD4BCC4648DE13DD
 [pull]
 	rebase = false
 [init]
