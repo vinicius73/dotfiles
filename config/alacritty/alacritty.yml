@@ -1,0 +1,102 @@
+schemes:
+  themer-light: &light
+    primary:
+      background: '#fafafa'
+      foreground: '#51535d'
+
+    cursor:
+      text: '#fafafa'
+      cursor: '#a626a4'
+
+    selection:
+      text: '#fafafa'
+      background: '#4078f2'
+
+    normal:
+      black: '#51535d'
+      red: '#e45649'
+      green: '#50a14f'
+      yellow: '#c18401'
+      blue: '#4078f2'
+      magenta: '#ca1243'
+      cyan: '#0184bc'
+      white: '#a0a1a7'
+
+    bright:
+      black: '#696c77'
+      red: '#E8776C'
+      green: '#72B371'
+      yellow: '#CC9C33'
+      blue: '#6592F4'
+      magenta: '#D44068'
+      cyan: '#339CC8'
+      white: '#cdced1'
+
+    dim:
+      black: '#383a42'
+      red: '#C25048'
+      green: '#4B8C4C'
+      yellow: '#A6750E'
+      blue: '#3E6CCF'
+      magenta: '#AD1A43'
+      cyan: '#0C75A4'
+      white: '#9d9d9f'
+  themer-dark: &dark
+    primary:
+      background: '#0e1112'
+      foreground: '#b8bbba'
+
+    cursor:
+      text: '#0e1112'
+      cursor: '#a074c4'
+
+    selection:
+      text: '#0e1112'
+      background: '#519aba'
+
+    normal:
+      black: '#474a4a'
+      red: '#cc3e44'
+      green: '#8dc149'
+      yellow: '#cbcb41'
+      blue: '#519aba'
+      magenta: '#f55385'
+      cyan: '#7494a3'
+      white: '#b8bbba'
+
+    bright:
+      black: '#636666'
+      red: '#CE5D61'
+      green: '#9BC565'
+      yellow: '#CDCD5F'
+      blue: '#6BA6C0'
+      magenta: '#EE6D95'
+      cyan: '#87A1AD'
+      white: '#d4d7d6'
+
+    dim:
+      black: '#2a2d2e'
+      red: '#A6353A'
+      green: '#749E3E'
+      yellow: '#A5A638'
+      blue: '#447F98'
+      magenta: '#C7466E'
+      cyan: '#607A86'
+      white: '#9b9e9e'
+
+colors: *dark
+font:
+  size: 15
+
+# shell:
+#   program: /usr/bin/fish
+
+cursor:
+  style:
+    shape: Underline
+    blinking: on
+
+key_bindings:
+  - { key: F11, action: ToggleFullscreen }
+  - { key: N, mods: Control, action: CreateNewWindow }
+  - { key: N, mods: Shift, action: SpawnNewInstance }

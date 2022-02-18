@@ -8,6 +8,10 @@ ln -s ~/dotfiles/config/fish/config.fish ~/.config/fish/config.fish
 rm -rf ~/.config/terminator && \
 ln -s ~/dotfiles/config/terminator/ ~/.config/terminator
 
+# alacritty
+rm -rf ~/.config/alacritty && \
+ln -s ~/dotfiles/config/alacritty/ ~/.config/alacritty
+
 # gitmoji-nodejs
 rm -rf ~/.config/gitmoji-nodejs && \
 ln -s ~/dotfiles/config/gitmoji-nodejs/ ~/.config/gitmoji-nodejs
