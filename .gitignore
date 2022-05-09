@@ -5,3 +5,4 @@ sublime/Packages/User/*.last-run
 sublime/Packages/User/*.merged-ca-bundle
 sublime/Packages/User/*.user-ca-bundle
 google-cloud-sdk/
+bash/envs.bash

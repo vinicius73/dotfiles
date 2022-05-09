@@ -29,3 +29,7 @@ end
 if test -d $DOTFILES/google-cloud-sdk
   source $DOTFILES/google-cloud-sdk/path.fish.inc
 end
+
+if test -f $DOTFILES/bash/envs.bash
+  source $DOTFILES/bash/envs.bash
+end
