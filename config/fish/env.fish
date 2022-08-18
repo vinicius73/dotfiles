@@ -20,6 +20,16 @@ if test -d /opt/android-sdk
   set -gx PATH /opt/android-sdk/platform-tools /opt/android-sdk/build-tools/30.0.0/ /opt/android-sdk/tools $PATH
 end
 
+if test -d ~/.deno
+  set -gx DENO_INSTALL ~/.deno
+  set -gx PATH ~/.deno/bin $PATH
+end
+
+if test -d $HOME/.local/share/pnpm
+  set -gx PNPM_HOME ~/.local/share/pnpm
+  set -gx $PNPM_HOME $PATH
+end
+
 set -gx SPACEFISH_DIR_TRUNC 0
 
 if test -f ~/bin/navi

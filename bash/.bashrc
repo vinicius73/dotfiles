@@ -122,6 +122,8 @@ echo -e "${red}Kernel: \t${cyan}" `uname -smr`
 echo -ne "${cyan}";upinfo;echo ""
 echo -e "${cyan}"; cal -3
 
+[[ -s "$DOTFILES/bash/envs.bash" ]] && source "$DOTFILES/bash/envs.bash"
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '${DOTFILES}/google-cloud-sdk/path.bash.inc' ]; then . '${DOTFILES}/google-cloud-sdk/path.bash.inc'; fi
 
@@ -132,4 +134,16 @@ if [ -f '${DOTFILES}/google-cloud-sdk/completion.bash.inc' ]; then . '${DOTFILES
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-[[ -s "$DOTFILES/bash/envs.bash" ]] && source "$DOTFILES/bash/envs.bash"
+
+if [ -d "$HOME/.deno" ]; then
+  export DENO_INSTALL="$HOME/.deno"
+  export PATH="$DENO_INSTALL/bin:$PATH"
+fi
+
+if [ -d "$HOME/.local/share/pnpm" ]; then
+  export PNPM_HOME="$HOME/.local/share/pnpm"
+  export PATH="$PNPM_HOME:$PATH"
+fi
+
+
+[ -d "$HOME/.cargo" ] && . "$HOME/.cargo/env"
