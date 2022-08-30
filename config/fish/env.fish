@@ -27,7 +27,7 @@ end
 
 if test -d $HOME/.local/share/pnpm
   set -gx PNPM_HOME ~/.local/share/pnpm
-  set -gx $PNPM_HOME $PATH
+  set -gx PATH $PNPM_HOME $PATH
 end
 
 set -gx SPACEFISH_DIR_TRUNC 0
