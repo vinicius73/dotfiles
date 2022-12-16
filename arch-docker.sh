@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-yay -Sy docker docker-compose --noconfirm --needed
+paru -Sy docker docker-compose --noconfirm --needed
 
 sudo usermod -aG docker $USER && \
 sudo systemctl enable docker && \

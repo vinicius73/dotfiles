@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-yay -S navi-bin --noconfirm --needed
+paru -S navi-bin --noconfirm --needed

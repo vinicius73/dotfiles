@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
-# https://aur.archlinux.org/packages/yay-bin/
+# https://aur.archlinux.org/packages/paru-bin
 
-sudo pacman -Sy --needed base-devel git wget yajl --noconfirm && \
-yay -S terminator alacritty fish pv fzf cowsay htop screenfetch figlet --noconfirm --needed && \
-yay -S git-extras ctop-bin gotop-bin --noconfirm --needed && \
-yay -S nodejs npm yarn --noconfirm --needed && \
-yay -S sublime-text-dev atom visual-studio-code-bin --noconfirm --needed && \
-yay -S telegram-desktop slack-desktop spotify --noconfirm --needed && \
-yay -S ttf-font powerline powerline-fonts noto-fonts-emoji ttf-fira-code ttf-liberation --noconfirm --needed && \
-yay -S dbeaver insomnia-bin libratbag piper --noconfirm  --needed && \
-yay -S peco ghq micro exa --noconfirm --needed
+sudo pacman -Sy --needed base-devel git --noconfirm && \
+paru -S terminator alacritty fish pv fzf cowsay htop screenfetch figlet --noconfirm --needed && \
+paru -S git-extras ctop-bin gotop-bin --noconfirm --needed && \
+paru -S nodejs npm yarn --noconfirm --needed && \
+paru -S visual-studio-code-bin 1password --noconfirm --needed && \
+paru -S telegram-desktop --noconfirm --needed && \
+paru -S ttf-font powerline powerline-fonts noto-fonts-emoji ttf-fira-code ttf-liberation --noconfirm --needed && \
+paru -S libratbag piper --noconfirm  --needed && \
+paru -S peco ghq micro exa --noconfirm --needed
+
+# paru -S dbeaver insomnia-bin --noconfirm  --needed

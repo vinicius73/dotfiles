@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-yay -Sy rustup --noconfirm --needed && \
+paru -Sy rustup --noconfirm --needed && \
 rustup toolchain stable && \
 rustup set profile complete && \
 rustup default stable && \
