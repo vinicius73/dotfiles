@@ -43,3 +43,7 @@ end
 if test -f $DOTFILES/bash/envs.bash
   source $DOTFILES/bash/envs.bash
 end
+
+if test -f /usr/share/doc/git-extras/git-extras.fish
+  source /usr/share/doc/git-extras/git-extras.fish
+end
