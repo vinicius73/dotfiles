@@ -3,8 +3,22 @@
 [user]
 	name = Vinicius Reis
 	email = luiz.vinicius73@gmail.com
-	signingkey = CD4BCC4648DE13DD
+	signingkey = BA98F2CB8401415B
 [pull]
 	rebase = false
 [init]
 	defaultBranch = master
+[commit]
+	gpgsign = true
+[sequence]
+	editor = code --wait
+
+[includeIf "gitdir:~/ghq/github.com/nextcloud/**"]
+  path = ~/ghq/github.com/nextcloud/.gitconfig
+[push]
+	default = simple
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
