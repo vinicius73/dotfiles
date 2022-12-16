@@ -29,6 +29,14 @@ find . -regextype sed -regex ".*/.yarn/cache" -exec rm -rf '{}' +
 find . -regextype sed -regex ".*/.yarn/install-state.gz" -exec rm -rf '{}' +
 ```
 
+### Find caches and tmp
+
+```sh
+find . -regextype sed -regex ".*/.terraform" -exec du -hs '{}' +
+find . -regextype sed -regex ".*/.tmp" -exec du -hs '{}' +
+find . -regextype sed -regex ".*/coverage" -exec du -hs '{}' +
+```
+
 ### Go bin and pkg
 
 ```sh
