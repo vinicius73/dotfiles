@@ -7,7 +7,7 @@ set -gx GOPATH ~/projects/go
 set -gx ANSIBLE_NOCOWS 1
 
 set -gx ANDROID_HOME /opt/android-sdk/
-set -gx JAVA_HOME /usr/lib/jvm/java-8-openjdk
+set -gx JAVA_HOME /usr/lib/jvm/default
 
 if test -d ~/.rvm/bin
   set -gx PATH ~/.rvm/bin $PATH

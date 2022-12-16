@@ -61,7 +61,7 @@ export VISUAL="subl3"
 export FONTCONFIG_FILE=/etc/fonts/
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/27.0.3/:/opt/android-sdk/tools"
-export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
+export JAVA_HOME="/usr/lib/jvm/default"
 export ANDROID_HOME="/opt/android-sdk/"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
