@@ -1,10 +1,6 @@
 [global_config]
   handle_size = 0
   window_state = maximise
-  title_transmit_fg_color = "#c5c5c5"
-  title_transmit_bg_color = "#1c1c1c"
-  title_inactive_fg_color = "#c5c5c5"
-  title_inactive_bg_color = "#666666"
   enabled_plugins = CustomCommandsMenu, TerminalShot, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
 [keybindings]
 [profiles]
@@ -12,8 +8,7 @@
     background_color = "#1c1c1c"
     background_darkness = 0.95
     background_type = transparent
-    cursor_color = "#c5c5c5"
-    font = Hack 13
+    font = Fira Code Medium 13
     foreground_color = "#c5c5c5"
     scrollback_lines = 6000
     scrollback_infinite = True
