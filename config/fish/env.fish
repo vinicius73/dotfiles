@@ -9,6 +9,12 @@ set -gx ANSIBLE_NOCOWS 1
 set -gx ANDROID_HOME /opt/android-sdk/
 set -gx JAVA_HOME /usr/lib/jvm/default
 
+set -gx VOLTA_HOME "$HOME/.volta"
+
+if test -d $VOLTA_HOME/bin
+  set -gx PATH "$VOLTA_HOME/bin" $PATH
+end
+
 if test -d ~/.rvm/bin
   set -gx PATH ~/.rvm/bin $PATH
   source ~/dotfiles/config/fish/rvm.fish
@@ -47,3 +53,4 @@ end
 if test -f /usr/share/doc/git-extras/git-extras.fish
   source /usr/share/doc/git-extras/git-extras.fish
 end
+
