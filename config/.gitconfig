@@ -3,7 +3,7 @@
 [user]
 	name = Vinicius Reis
 	email = luiz.vinicius73@gmail.com
-	signingkey = BA98F2CB8401415B
+	signingkey = 3CA967C220C58445
 [pull]
 	rebase = false
 [init]
