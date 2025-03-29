@@ -3,13 +3,10 @@
 [user]
 	name = Vinicius Reis
 	email = luiz.vinicius73@gmail.com
-	signingkey = 9D888F201A5E58BCFD9AA19BAF47E134B81DA48D
 [pull]
 	rebase = false
 [init]
 	defaultBranch = master
-[commit]
-	gpgsign = true
 [sequence]
 	editor = code --wait
 [push]

@@ -59,10 +59,6 @@ export VISUAL="subl3"
 
 # EXTRA
 export FONTCONFIG_FILE=/etc/fonts/
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-export PATH="$PATH:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/27.0.3/:/opt/android-sdk/tools"
-export JAVA_HOME="/usr/lib/jvm/default"
-export ANDROID_HOME="/opt/android-sdk/"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
@@ -146,12 +142,16 @@ if [ -d "$HOME/.local/share/pnpm" ]; then
 fi
 
 
-[ -d "$HOME/.cargo" ] && . "$HOME/.cargo/env"
-
+[ -d "$HOME/.cargo" ] && 
 if [ -d "$HOME/.volta" ]; then
   export VOLTA_HOME="$HOME/.volta"
+  # it will manage npm global installs
   export PATH="$VOLTA_HOME/bin:$PATH"
 fi
 
 export GPG_TTY=$(tty)
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock
+
+if [ -d "$HOME/.cargo" ]; then
+  . "$HOME/.cargo/env"
+fi
