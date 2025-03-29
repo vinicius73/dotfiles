@@ -152,3 +152,6 @@ if [ -d "$HOME/.volta" ]; then
   export VOLTA_HOME="$HOME/.volta"
   export PATH="$VOLTA_HOME/bin:$PATH"
 fi
+
+export GPG_TTY=$(tty)
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock

@@ -3,7 +3,7 @@
 [user]
 	name = Vinicius Reis
 	email = luiz.vinicius73@gmail.com
-	signingkey = 3CA967C220C58445
+	signingkey = 9D888F201A5E58BCFD9AA19BAF47E134B81DA48D
 [pull]
 	rebase = false
 [init]
@@ -12,9 +12,6 @@
 	gpgsign = true
 [sequence]
 	editor = code --wait
-
-[includeIf "gitdir:~/ghq/github.com/nextcloud/**"]
-  path = ~/ghq/github.com/nextcloud/.gitconfig
 [push]
 	default = simple
 [filter "lfs"]
@@ -22,3 +19,8 @@
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
+[tag]
+	gpgSign = true
+
+[includeIf "gitdir:~/ghq/github.com/nextcloud/**"]
+  path = ~/ghq/github.com/nextcloud/.gitconfig

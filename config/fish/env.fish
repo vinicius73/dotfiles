@@ -54,3 +54,4 @@ if test -f /usr/share/doc/git-extras/git-extras.fish
   source /usr/share/doc/git-extras/git-extras.fish
 end
 
+set -gx DOCKER_HOST unix://$XDG_RUNTIME_DIR/docker.sock
