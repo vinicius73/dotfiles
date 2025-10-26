@@ -157,3 +157,8 @@ fi
 if [ -d "$HOME/.lmstudio" ]; then
   export PATH="$PATH:/home/vinicius/.lmstudio/bin"
 fi
+
+# Id go-task command exists, create a alias for it
+if command -v go-task &> /dev/null; then
+  alias task='go-task'
+fi
