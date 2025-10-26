@@ -142,7 +142,7 @@ if [ -d "$HOME/.local/share/pnpm" ]; then
 fi
 
 
-[ -d "$HOME/.cargo" ] && 
+[ -d "$HOME/.cargo" ] &&
 if [ -d "$HOME/.volta" ]; then
   export VOLTA_HOME="$HOME/.volta"
   # it will manage npm global installs
@@ -150,8 +150,11 @@ if [ -d "$HOME/.volta" ]; then
 fi
 
 export GPG_TTY=$(tty)
-export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock
 
 if [ -d "$HOME/.cargo" ]; then
   . "$HOME/.cargo/env"
+fi
+
+if [ -d "$HOME/.lmstudio" ]; then
+  export PATH="$PATH:/home/vinicius/.lmstudio/bin"
 fi

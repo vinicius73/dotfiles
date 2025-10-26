@@ -54,4 +54,9 @@ if test -f /usr/share/doc/git-extras/git-extras.fish
   source /usr/share/doc/git-extras/git-extras.fish
 end
 
-set -gx DOCKER_HOST unix://$XDG_RUNTIME_DIR/docker.sock
+# bun
+set -gx BUN_INSTALL "$HOME/.bun"
+
+if test -d $BUN_INSTALL
+  set -gx PATH "$BUN_INSTALL/bin" $PATH
+end

@@ -3,6 +3,7 @@
 [user]
 	name = Vinicius Reis
 	email = luiz.vinicius73@gmail.com
+	signingkey = 4871AE2E95DC2D581751133566ADB7CB0473C199
 [pull]
 	rebase = false
 [init]
@@ -21,3 +22,5 @@
 
 [includeIf "gitdir:~/ghq/github.com/nextcloud/**"]
   path = ~/ghq/github.com/nextcloud/.gitconfig
+[commit]
+	gpgsign = true

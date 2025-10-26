@@ -1,3 +1,7 @@
+if type -q go-task
+    alias task="go-task"
+end
+
 if type -q exa
   alias ll "exa -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso"
   alias la "exa -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso -a"
