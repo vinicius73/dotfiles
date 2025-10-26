@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-git clone http://github.com/possatti/pokemonsay --depth=1 && \
+git clone https://github.com/HRKings/pokemonsay-newgenerations pokemonsay --depth=1 && \
 cd pokemonsay && \
 bash install.sh
