@@ -1,46 +1,54 @@
-# Useful Commands and Scripts
+# Project Maintenance Scripts
 
-## Delete project cache and dependencies
+Bash scripts for cleaning and maintaining development projects.
 
-### Delete all `node_modules`
+## Available Scripts
 
-> From https://stackoverflow.com/questions/42950501/delete-node-modules-folder-recursively-from-a-specified-path-using-command-line
+| Script | Function |
+|--------|----------|
+| `maintain-git-repos.sh` | Git repository maintenance (fetch, gc, prune, fsck) |
+| `clean-go-bins.sh` | Remove `bin` directories from Go projects |
+| `clean-node-modules.sh` | Remove `node_modules` and `.serverless` from Node.js projects |
+| `clean-rust-targets.sh` | Remove `target` directories from Rust projects |
+| `check-js-vulnerabilities.sh` | Check vulnerabilities in JavaScript projects |
 
-```sh
-# list all
-find . -name 'node_modules' -type d -prune
+## Basic Usage
 
-# remove all
-find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+```bash
+# Make executable
+chmod +x *.sh
+
+# Run (interactive mode)
+./maintain-git-repos.sh
+./clean-go-bins.sh
+./clean-node-modules.sh
+./clean-rust-targets.sh
+./check-js-vulnerabilities.sh
+
+# Simulate operations (dry-run)
+./clean-go-bins.sh --dry-run
+./clean-node-modules.sh --dry-run
+./clean-rust-targets.sh --dry-run
+
+# Force cleanup (no confirmation)
+./clean-go-bins.sh --force
+./clean-node-modules.sh --force
 ```
 
-### Find `vendor` folders
+## Common Options
 
-```sh
-find . -name 'vendor' -type d -prune
-```
+- `--help` - Show help
+- `--verbose` - Verbose output
+- `--dry-run` - Simulate without executing
+- `--force` - Execute without confirmation (cleanup only)
 
-### Find yarn cache
+## Requirements
 
-```sh
-find . -regextype sed -regex ".*/.yarn/cache"
-find . -regextype sed -regex ".*/.yarn/cache" -exec rm -rf '{}' +
+- Bash 4.0+
+- Git
+- Specific tools: Go, Node.js/npm, Rust/Cargo
 
-find . -regextype sed -regex ".*/.yarn/install-state.gz" -exec rm -rf '{}' +
-```
+## Security
 
-### Find caches and tmp
-
-```sh
-find . -regextype sed -regex ".*/.terraform" -exec du -hs '{}' +
-find . -regextype sed -regex ".*/.tmp" -exec du -hs '{}' +
-find . -regextype sed -regex ".*/coverage" -exec du -hs '{}' +
-```
-
-### Go bin and pkg
-
-```sh
-cd $GOPATH
-pwd
-rm -rf ./*
-```
+- All scripts verify Git repositories
+- Use `--dry-run` to test before executing
