@@ -71,7 +71,6 @@ fi
 [[ -s "~/bin/nav" ]] && source "$(navi widget bash)" # ctrl+g
 
 source $DOTFILES/bash/docker-alias.bash
-source $DOTFILES/bash/ambientum.bash
 
 #------------------------------------------////
 # Some default .bashrc contents:
