@@ -8,9 +8,10 @@ DOTFILES_REPO_ROOT=$repo_root
 export DOTFILES_REPO_ROOT
 . "$repo_root/script/lib/dotfiles.sh"
 . "$repo_root/script/lib/pokemonsay.sh"
+. "$repo_root/script/lib/shell-plugins.sh"
 
 usage() {
-  printf '%s\n' "Usage: script/profile list | plan <cli|desktop|docker|pokemonsay|rust|shell> | apply <cli|desktop|docker|pokemonsay|rust|shell>"
+  printf '%s\n' "Usage: script/profile list | plan <cli|desktop|docker|pokemonsay|rust|shell|shell-plugins> | apply <cli|desktop|docker|pokemonsay|rust|shell|shell-plugins>"
 }
 
 profile_platform() {
@@ -50,7 +51,7 @@ plan_profile() {
     pokemonsay) plan_packages pokemonsay; pokemonsay_plan; pokemonsay_preflight ;;
     rust) plan_packages rust; printf '%s\n' "Installs the stable Rust toolchain and rustfmt, clippy, rust-src." ;;
     shell) printf '%s\n' "Sets Fish as the login shell after separate confirmations." ;;
-    *) usage >&2; exit 2 ;;
+    shell-plugins) shell_plugins_plan ;;
   esac
 }
 
@@ -96,7 +97,7 @@ apply_profile() {
       dotfiles_confirm "Change your login shell to $fish_bin."
       chsh -s "$fish_bin"
       ;;
-    *) usage >&2; exit 2 ;;
+    shell-plugins) shell_plugins_plan; shell_plugins_install_zsh; shell_plugins_install_fish ;;
   esac
 }
 
@@ -109,6 +110,7 @@ case "${1:-}" in
     printf '%s\n' "pokemonsay Optional pinned upstream payload and cowsay dependency"
     printf '%s\n' "rust        Arch Linux only: rustup stable toolchain"
     printf '%s\n' "shell       Explicitly sets Fish as the login shell"
+    printf '%s\n' "shell-plugins Installs pinned Fish and Zsh plugins after confirmation"
     ;;
   plan) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; plan_profile "$2" ;;
   apply) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; apply_profile "$2" ;;

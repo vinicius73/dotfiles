@@ -4,10 +4,17 @@ fi
 
 export ANSIBLE_NOCOWS=1
 
-if command -v mise >/dev/null 2>&1; then
-  eval "$(mise activate bash)"
+if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh" ]; then
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh"
+  dotfiles_load_environment
 fi
 
-if command -v go-task >/dev/null 2>&1; then
-  alias task='go-task'
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
+export PATH
+
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash)"
 fi

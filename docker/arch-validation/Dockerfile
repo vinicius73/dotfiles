@@ -8,7 +8,8 @@ RUN sed -i 's/^#DisableSandbox/DisableSandbox/' /etc/pacman.conf \
     git \
     mise \
     ruby \
-    shellcheck
+    shellcheck \
+    zsh
 
 WORKDIR /workspace
 

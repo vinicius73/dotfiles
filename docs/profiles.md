@@ -4,7 +4,7 @@ Profiles are intentionally planned and applied one at a time. Use `script/profil
 
 ## cli
 
-Installs curated command-line tools. On Arch, it also installs `git-extras` for the managed Fish integration. It does not affect shell ownership or language runtimes.
+Installs curated command-line tools, including `bat`, `eza`, `fd`, `fzf`, `ghq`, and `git-extras` on both platforms. It does not affect shell ownership or language runtimes.
 
 ## desktop
 
@@ -29,3 +29,7 @@ Available only on Arch. paru installs `rustup`; rustup configures the stable too
 ## shell
 
 Changes the login shell to Fish only after interactive confirmation. It will never run in non-interactive automation.
+
+## shell-plugins
+
+Installs the commit-pinned Fish and Zsh plugins declared by the managed Fish declaration and Zsh lockfile. It clones the Zsh framework and plugins into `${XDG_DATA_HOME:-~/.local/share}/dotfiles/shell`, verifies each detached commit, and refuses symlinked, unmanaged, unexpected-source, or modified plugin directories. Fish uses the vendored Fisher function and the managed `fish_plugins` declaration. The operation requires an interactive terminal and explicit confirmation; shells never download or update plugins during startup.

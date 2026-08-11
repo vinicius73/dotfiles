@@ -67,6 +67,28 @@ script/verify
 mise doctor
 ```
 
+## Shells
+
+Fish and Zsh use the same optional local environment directory: `~/.config/dotfiles/env.d`.
+
+Create the directory with strict permissions, then add literal `NAME=value` entries to `*.env` files:
+
+```sh
+mkdir -p ~/.config/dotfiles/env.d
+chmod 700 ~/.config/dotfiles ~/.config/dotfiles/env.d
+touch ~/.config/dotfiles/env.d/personal.env
+chmod 600 ~/.config/dotfiles/env.d/personal.env
+```
+
+Files are ignored when their owner or permissions are unsafe. Values do not support quotes, expansion, commands, or multiline syntax. Keep high-privilege and short-lived credentials in the macOS Keychain and retrieve them only for the command that needs them.
+
+Install the pinned Fish and Zsh plugins explicitly after reviewing the plan:
+
+```sh
+script/profile plan shell-plugins
+script/profile apply shell-plugins
+```
+
 ## Validation
 
 Run the local shell validation suite with:

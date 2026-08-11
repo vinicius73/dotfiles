@@ -1,0 +1,44 @@
+if [[ ! -o interactive ]]; then
+  return
+fi
+
+export ANSIBLE_NOCOWS=1
+
+if [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh" ]]; then
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh"
+  dotfiles_load_environment
+fi
+
+typeset -U path PATH
+path=("$HOME/.local/bin" $path)
+export PATH
+
+if (( $+commands[mise] )) && [[ -z ${MISE_SHELL:-} ]]; then
+  eval "$(mise activate zsh)"
+fi
+
+export ZSH="$HOME/.local/share/dotfiles/shell/ohmyzsh"
+autoload -Uz compaudit
+insecure_completion_directories=(${(f)"$(compaudit 2>/dev/null)"})
+if (( ${#insecure_completion_directories} )); then
+  print -u2 'dotfiles: refusing insecure Zsh completion directories'
+else
+  if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
+    plugins=(git fzf)
+    source "$ZSH/oh-my-zsh.sh"
+  fi
+fi
+
+if [[ -r "$HOME/.local/share/dotfiles/shell/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  source "$HOME/.local/share/dotfiles/shell/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+if [[ -r "$HOME/.local/share/dotfiles/shell/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$HOME/.local/share/dotfiles/shell/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+if (( $+commands[eza] )); then
+  alias ll='eza -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso'
+  alias la='eza -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso -a'
+  alias lla='ll -a'
+fi

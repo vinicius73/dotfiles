@@ -10,13 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install validation tools
-        run: brew install shellcheck chezmoi fish mise
+        run: brew install shellcheck chezmoi fish mise zsh
       - name: Validate shell scripts
         run: |
-          sh -n script/bootstrap script/profile script/verify script/validate-docker script/lib/dotfiles.sh script/lib/pokemonsay.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities docker/arch-validation/validate.sh
+          sh -n script/bootstrap script/profile script/verify script/validate-docker script/lib/dotfiles.sh script/lib/pokemonsay.sh script/lib/shell-plugins.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities docker/arch-validation/validate.sh home/dot_config/dotfiles/shell/env.sh
           bash -n home/dot_bashrc
-          shellcheck -s sh script/bootstrap script/profile script/verify script/validate-docker script/lib/dotfiles.sh script/lib/pokemonsay.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities docker/arch-validation/validate.sh
-          fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/git-extras.fish home/dot_config/fish/functions/dotfiles_greeting.fish
+          zsh -n home/dot_zshrc
+          shellcheck -s sh script/bootstrap script/profile script/verify script/validate-docker script/lib/dotfiles.sh script/lib/pokemonsay.sh script/lib/shell-plugins.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities docker/arch-validation/validate.sh home/dot_config/dotfiles/shell/env.sh
+          fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/git-extras.fish home/dot_config/fish/functions/dotfiles_greeting.fish home/dot_config/fish/functions/dotfiles_load_environment.fish home/dot_config/fish/functions/fisher.fish
       - name: Run shell tests
         run: sh tests/run.sh
       - name: Validate Chezmoi source and shell startup output
@@ -25,6 +26,8 @@ jobs:
           chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" apply
           chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" verify
           HOME="$temporary_home" bash --login -ic 'test "$ANSIBLE_NOCOWS" = 1' 2>/dev/null
+          HOME="$temporary_home" fish -ic 'true' >/dev/null 2>&1
+          HOME="$temporary_home" zsh -ic 'true' >/dev/null 2>&1
       - name: Validate mise configuration
         run: |
           temporary_config="$(mktemp -d)"

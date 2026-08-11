@@ -1,3 +1,6 @@
+bat
+eza
+fd
 fzf
 ghq
 git-extras

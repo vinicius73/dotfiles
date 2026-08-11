@@ -5,3 +5,4 @@ curl
 fish
 git
 mise
+zsh
