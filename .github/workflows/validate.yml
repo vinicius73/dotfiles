@@ -17,15 +17,11 @@ jobs:
           bash -n home/dot_bashrc
           shellcheck -s sh script/bootstrap script/profile script/verify
           fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/linux.fish
-      - name: Validate Chezmoi source
+      - name: Validate Chezmoi source and shell startup output
         run: |
           temporary_home="$(mktemp -d)"
           chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" apply
           chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" verify
-      - name: Validate shell startup output
-        run: |
-          temporary_home="$(mktemp -d)"
-          chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" apply
           HOME="$temporary_home" bash --login -ic 'test "$ANSIBLE_NOCOWS" = 1' 2>/dev/null
       - name: Validate mise configuration
         run: |

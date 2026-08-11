@@ -5,8 +5,8 @@ set -eu
 status=0
 
 check_command() {
-  if command -v "$1" >/dev/null 2>&1; then
-    printf '%s\n' "ok: $1 -> $(command -v "$1")"
+  if path=$(command -v "$1"); then
+    printf '%s\n' "ok: $1 -> $path"
   else
     printf '%s\n' "missing: $1" >&2
     status=1

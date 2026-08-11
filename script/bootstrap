@@ -105,14 +105,12 @@ else
   fi
 fi
 
-if [ "$apply" = true ]; then
-  printf '%s' "Apply the displayed Chezmoi changes? [y/N] "
-  read -r answer
-  case "$answer" in
-    y|Y|yes|YES) ;;
-    *) printf '%s\n' "No files were applied."; exit 0 ;;
-  esac
-fi
+printf '%s' "Apply the displayed Chezmoi changes? [y/N] "
+read -r answer
+case "$answer" in
+  y|Y|yes|YES) ;;
+  *) printf '%s\n' "No files were applied."; exit 0 ;;
+esac
 
 chezmoi apply
 mise install

@@ -39,19 +39,25 @@ brew_bin() {
   }
 }
 
+install_brewfile() {
+  brew=$(brew_bin)
+  "$brew" bundle check --file "$1" >/dev/null 2>&1 || \
+    "$brew" bundle install --file "$1" --no-upgrade
+}
+
 apply_profile() {
   profile=$1
   case "$profile" in
     cli)
       if [ "$platform" = macos ]; then
-        "$(brew_bin)" bundle install --file "$repo_root/Brewfile.cli" --no-upgrade
+        install_brewfile "$repo_root/Brewfile.cli"
       else
         install_arch_list "$repo_root/packages/arch/cli.txt"
       fi
       ;;
     desktop)
       if [ "$platform" = macos ]; then
-        "$(brew_bin)" bundle install --file "$repo_root/Brewfile.desktop" --no-upgrade
+        install_brewfile "$repo_root/Brewfile.desktop"
       else
         install_arch_list "$repo_root/packages/arch/desktop.txt"
         printf '%s\n' "AUR desktop packages are intentionally not installed automatically. Review packages/arch/aur-desktop.txt first."
@@ -59,7 +65,7 @@ apply_profile() {
       ;;
     docker)
       if [ "$platform" = macos ]; then
-        "$(brew_bin)" bundle install --file "$repo_root/Brewfile.docker" --no-upgrade
+        install_brewfile "$repo_root/Brewfile.docker"
         printf '%s\n' "Start Docker Desktop and complete its first-run setup before using Docker."
       else
         install_arch_list "$repo_root/packages/arch/docker.txt"
