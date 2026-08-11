@@ -53,8 +53,12 @@ validate_shell_syntax() {
     home/dot_config/fish/config.fish \
     home/dot_config/fish/conf.d/git-extras.fish \
     home/dot_config/fish/functions/dotfiles_configure_shell.fish \
+    home/dot_config/fish/functions/dotfiles_environment_secure.fish \
     home/dot_config/fish/functions/dotfiles_greeting.fish \
     home/dot_config/fish/functions/dotfiles_load_environment.fish \
+    home/dot_config/fish/functions/dotfiles_load_environment_file.fish \
+    home/dot_config/fish/functions/dotfiles_load_keychain_secrets.fish \
+    home/dot_config/fish/functions/dotfiles_validate_secrets.fish \
     home/dot_config/fish/functions/fisher.fish
 }
 
