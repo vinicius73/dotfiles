@@ -18,5 +18,8 @@ assert_contains "$output" "Platform: arch"
 assert_contains "$output" "packages/arch/cli.txt"
 assert_contains "$output" "git-extras"
 
+output=$(DOTFILES_ARCH_RELEASE_FILE="$temporary_dir/arch-release" PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan shell-plugins)
+assert_contains "$output" "AUR package: zsh-antidote"
+
 output=$(DOTFILES_ARCH_RELEASE_FILE="$temporary_dir/arch-release" PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan rust)
 assert_contains "$output" "packages/arch/rust.txt"

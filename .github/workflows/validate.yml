@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install validation tools
-        run: brew install shellcheck chezmoi fish mise zsh
+        run: brew install shellcheck chezmoi fish mise zsh antidote
       - name: Validate shell scripts
         run: |
           sh -n script/bootstrap script/profile script/verify script/validate-docker script/lib/dotfiles.sh script/lib/pokemonsay.sh script/lib/shell-plugins.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities docker/arch-validation/validate.sh home/dot_config/dotfiles/shell/env.sh
@@ -28,6 +28,9 @@ jobs:
           HOME="$temporary_home" bash --login -ic 'test "$ANSIBLE_NOCOWS" = 1' 2>/dev/null
           HOME="$temporary_home" fish -ic 'true' >/dev/null 2>&1
           HOME="$temporary_home" zsh -ic 'true' >/dev/null 2>&1
+          temporary_cache="$(mktemp -d)"
+          ANTIDOTE_HOME="$temporary_cache/antidote" zsh -fc 'source "$(brew --prefix antidote)/share/antidote/antidote.zsh"; antidote bundle < "$1"' zsh "$GITHUB_WORKSPACE/home/dot_config/zsh/plugins.txt" > "$temporary_cache/plugins.zsh"
+          test -s "$temporary_cache/plugins.zsh"
       - name: Validate mise configuration
         run: |
           temporary_config="$(mktemp -d)"

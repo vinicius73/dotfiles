@@ -89,6 +89,8 @@ script/profile plan shell-plugins
 script/profile apply shell-plugins
 ```
 
+Fish uses Fisher; Zsh uses Antidote and writes its generated loader to `${XDG_CACHE_HOME:-~/.cache}/dotfiles/zsh/plugins.zsh`. Startup never downloads or updates plugins.
+
 ## Validation
 
 Run the local shell validation suite with:

@@ -14,6 +14,9 @@ chmod 755 "$temporary_dir/bin/uname"
 output=$(PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" list)
 assert_contains "$output" "pokemonsay"
 
+output=$(PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan shell-plugins)
+assert_contains "$output" "Generated Zsh loader"
+
 if PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan rust >/dev/null 2>&1; then
   fail "rust plan unexpectedly succeeded on macOS"
 else

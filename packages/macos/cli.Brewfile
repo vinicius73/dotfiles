@@ -1,3 +1,4 @@
+brew "antidote"
 brew "bat"
 brew "eza"
 brew "fd"

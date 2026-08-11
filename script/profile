@@ -97,7 +97,7 @@ apply_profile() {
       dotfiles_confirm "Change your login shell to $fish_bin."
       chsh -s "$fish_bin"
       ;;
-    shell-plugins) shell_plugins_plan; shell_plugins_install_zsh; shell_plugins_install_fish ;;
+    shell-plugins) shell_plugins_plan; shell_plugins_install_fish; shell_plugins_install_zsh ;;
   esac
 }
 

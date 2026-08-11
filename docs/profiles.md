@@ -32,4 +32,6 @@ Changes the login shell to Fish only after interactive confirmation. It will nev
 
 ## shell-plugins
 
-Installs the commit-pinned Fish and Zsh plugins declared by the managed Fish declaration and Zsh lockfile. It clones the Zsh framework and plugins into `${XDG_DATA_HOME:-~/.local/share}/dotfiles/shell`, verifies each detached commit, and refuses symlinked, unmanaged, unexpected-source, or modified plugin directories. Fish uses the vendored Fisher function and the managed `fish_plugins` declaration. The operation requires an interactive terminal and explicit confirmation; shells never download or update plugins during startup.
+Installs the pinned Fish and Zsh plugin declarations after interactive confirmation. Fish uses the vendored Fisher function and the managed `fish_plugins` file. Zsh uses Antidote from Homebrew on macOS and the separately confirmed `zsh-antidote` AUR package on Arch; it generates a static loader at `${XDG_CACHE_HOME:-~/.cache}/dotfiles/zsh/plugins.zsh`.
+
+Shell startup only sources installed plugin files and the generated Zsh loader; it never fetches or updates plugins. To add, remove, or update a plugin, edit its managed declaration, run `script/bootstrap apply` to synchronize it, review `script/profile plan shell-plugins`, then run `script/profile apply shell-plugins` and `script/verify`. Pins use complete commit SHAs and prevent automatic revision changes, but do not verify upstream signatures or sandbox third-party code.

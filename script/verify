@@ -4,6 +4,12 @@ set -eu
 
 status=0
 
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+DOTFILES_REPO_ROOT=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+export DOTFILES_REPO_ROOT
+. "$DOTFILES_REPO_ROOT/script/lib/dotfiles.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/shell-plugins.sh"
+
 result() {
   printf '%-5s %s %s\n' "$1" "$2" "$3"
   [ "$1" != fail ] || status=1
@@ -13,7 +19,7 @@ check_command() {
   if path=$(command -v "$1"); then result ok "base.command.$1" "$path"; else result fail "base.command.$1" missing; fi
 }
 
-for command in chezmoi fish mise; do check_command "$command"; done
+for command in chezmoi fish mise zsh; do check_command "$command"; done
 
 if command -v chezmoi >/dev/null 2>&1; then
   chezmoi_source=$(chezmoi source-path 2>/dev/null || true)
@@ -61,5 +67,7 @@ if [ -e "$pokemonsay_data" ] || [ -e "$pokemonsay_bin" ]; then
 else
   result skip pokemonsay.profile not-installed
 fi
+
+shell_plugins_verify
 
 exit "$status"

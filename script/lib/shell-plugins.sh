@@ -1,103 +1,84 @@
 #!/bin/sh
 
-shell_plugins_root() {
-  shell_plugins_data_home=$(dotfiles_xdg_home XDG_DATA_HOME "$HOME/.local/share")
-  case "$shell_plugins_data_home" in "$HOME"/*) ;; *) dotfiles_die "XDG data directory must be below HOME." ;; esac
-  [ ! -e "$shell_plugins_data_home" ] || [ ! -L "$shell_plugins_data_home" ] || dotfiles_die "Refusing symlinked XDG data directory: $shell_plugins_data_home"
-  shell_plugins_root_dir="$shell_plugins_data_home/dotfiles/shell"
-  shell_plugins_lock="$DOTFILES_REPO_ROOT/home/dot_config/zsh/plugins.lock"
+shell_plugins_fish_config() {
+  shell_plugins_fish_config=${XDG_CONFIG_HOME:-$HOME/.config}/fish
+  dotfiles_absolute_path "$shell_plugins_fish_config"
 }
 
-shell_plugins_validate_lock() {
-  [ -s "$shell_plugins_lock" ] || dotfiles_die "Shell plugin lockfile is missing: $shell_plugins_lock"
-  while IFS=' ' read -r shell_plugins_repository shell_plugins_commit shell_plugins_extra; do
-    [ -n "$shell_plugins_repository" ] || continue
-    [ -z "${shell_plugins_extra:-}" ] || dotfiles_die "Invalid shell plugin lockfile entry."
-    case "$shell_plugins_repository" in [A-Za-z0-9_.-]*/[A-Za-z0-9_.-]*) ;; *) dotfiles_die "Invalid shell plugin repository." ;; esac
-    if ! printf '%s\n' "$shell_plugins_commit" | grep -Eq '^[0-9a-f]{40}$'; then
-      dotfiles_die "Shell plugin commits must be full lowercase SHA-1 values."
-    fi
-  done < "$shell_plugins_lock"
+shell_plugins_zsh_paths() {
+  shell_plugins_cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
+  dotfiles_absolute_path "$shell_plugins_cache_home"
+  shell_plugins_zsh_bundles="$DOTFILES_REPO_ROOT/home/dot_config/zsh/plugins.txt"
+  shell_plugins_zsh_static="$shell_plugins_cache_home/dotfiles/zsh/plugins.zsh"
 }
 
-shell_plugins_install_zsh() {
-  shell_plugins_root
-  shell_plugins_validate_lock
-  dotfiles_require_command git
-  mkdir -p "$shell_plugins_root_dir"
-  [ ! -L "$shell_plugins_root_dir" ] || dotfiles_die "Refusing symlinked shell plugin directory: $shell_plugins_root_dir"
-  while IFS=' ' read -r shell_plugins_repository shell_plugins_commit; do
-    [ -n "$shell_plugins_repository" ] || continue
-    shell_plugins_name=${shell_plugins_repository##*/}
-    shell_plugins_target="$shell_plugins_root_dir/$shell_plugins_name"
-    shell_plugins_stage=$(mktemp -d "$shell_plugins_root_dir/.${shell_plugins_name}.stage.XXXXXX")
-    trap 'rm -rf "${shell_plugins_stage:-}"' 0 HUP INT TERM
-    git clone --no-checkout "https://github.com/$shell_plugins_repository.git" "$shell_plugins_stage"
-    git -C "$shell_plugins_stage" checkout --detach "$shell_plugins_commit"
-    [ "$(git -C "$shell_plugins_stage" rev-parse HEAD)" = "$shell_plugins_commit" ] || dotfiles_die "Shell plugin did not resolve to the required commit: $shell_plugins_repository"
-    : > "$shell_plugins_stage/.dotfiles-shell-plugin"
-    if [ -e "$shell_plugins_target" ] || [ -L "$shell_plugins_target" ]; then
-      [ -d "$shell_plugins_target" ] && [ ! -L "$shell_plugins_target" ] && [ -f "$shell_plugins_target/.dotfiles-shell-plugin" ] || dotfiles_die "Refusing unmanaged shell plugin path: $shell_plugins_target"
-      git -C "$shell_plugins_target" remote get-url origin | grep -Fx "https://github.com/$shell_plugins_repository.git" >/dev/null || dotfiles_die "Refusing unexpected shell plugin source: $shell_plugins_target"
-      if ! git -C "$shell_plugins_target" diff --quiet || ! git -C "$shell_plugins_target" diff --cached --quiet || [ -n "$(git -C "$shell_plugins_target" status --porcelain --untracked-files=all | grep -v -E '^\?\? \.dotfiles-shell-plugin$' || true)" ]; then
-        dotfiles_die "Refusing modified shell plugin path: $shell_plugins_target"
-      fi
-      shell_plugins_backup=$(mktemp -d "$shell_plugins_root_dir/.${shell_plugins_name}.backup.XXXXXX")
-      rmdir "$shell_plugins_backup"
-      mv "$shell_plugins_target" "$shell_plugins_backup"
-    else
-      shell_plugins_backup=
-    fi
-    if ! mv "$shell_plugins_stage" "$shell_plugins_target"; then
-      [ -z "$shell_plugins_backup" ] || mv "$shell_plugins_backup" "$shell_plugins_target" || true
-      dotfiles_die "Unable to activate shell plugin: $shell_plugins_repository"
-    fi
-    shell_plugins_stage=
-    [ -z "$shell_plugins_backup" ] || rm -rf "$shell_plugins_backup"
-  done < "$shell_plugins_lock"
+shell_plugins_antidote() {
+  case "$(dotfiles_platform)" in
+    macos)
+      shell_plugins_brew=$(dotfiles_require_brew)
+      shell_plugins_antidote=$("$shell_plugins_brew" --prefix antidote)/share/antidote/antidote.zsh
+      ;;
+    arch) shell_plugins_antidote=/usr/share/antidote/antidote.zsh ;;
+  esac
+  [ -r "$shell_plugins_antidote" ] || dotfiles_die "Antidote is unavailable. Install the cli profile first."
+}
+
+shell_plugins_validate_fish() {
+  shell_plugins_fish_config
+  shell_plugins_fish_declaration="$shell_plugins_fish_config/fish_plugins"
+  [ -f "$shell_plugins_fish_declaration" ] && [ ! -L "$shell_plugins_fish_declaration" ] || dotfiles_die "Fish plugin declaration is missing or invalid: $shell_plugins_fish_declaration"
+  cmp -s "$DOTFILES_REPO_ROOT/home/dot_config/fish/fish_plugins" "$shell_plugins_fish_declaration" || dotfiles_die "Fish plugin declaration differs from the managed source. Run script/bootstrap apply and review the diff."
 }
 
 shell_plugins_install_fish() {
   dotfiles_require_command fish
-  fish_plugins_file="$HOME/.config/fish/fish_plugins"
-  [ -f "$fish_plugins_file" ] || dotfiles_die "Fish plugin declaration is missing: $fish_plugins_file"
+  shell_plugins_validate_fish
   fish -c 'fisher update'
 }
 
-shell_plugins_verify_zsh() {
-  shell_plugins_root
-  shell_plugins_validate_lock
-  while IFS=' ' read -r shell_plugins_repository shell_plugins_commit; do
-    [ -n "$shell_plugins_repository" ] || continue
-    shell_plugins_target="$shell_plugins_root_dir/${shell_plugins_repository##*/}"
-    if [ -d "$shell_plugins_target" ] && [ ! -L "$shell_plugins_target" ] && [ -f "$shell_plugins_target/.dotfiles-shell-plugin" ] && [ "$(git -C "$shell_plugins_target" rev-parse HEAD 2>/dev/null || true)" = "$shell_plugins_commit" ]; then
-      printf '%-5s %s %s\n' ok "zsh.plugin.${shell_plugins_repository##*/}" "$shell_plugins_commit"
-    else
-      printf '%-5s %s %s\n' fail "zsh.plugin.${shell_plugins_repository##*/}" invalid
-    fi
-  done < "$shell_plugins_lock"
-}
-
-shell_plugins_verify_fish() {
-  fish_plugins_file="$HOME/.config/fish/fish_plugins"
-  if command -v fish >/dev/null 2>&1 && [ -f "$fish_plugins_file" ] && fish -c 'fisher list' >/dev/null 2>&1; then
-    printf '%-5s %s %s\n' ok fish.plugins valid
-  else
-    printf '%-5s %s %s\n' skip fish.plugins not-installed
+shell_plugins_install_zsh() {
+  dotfiles_require_command zsh
+  if [ "$(dotfiles_platform)" = arch ]; then
+    shell_plugins_aur_manifest="$DOTFILES_REPO_ROOT/packages/arch/aur-shell-plugins.txt"
+    dotfiles_validate_manifest "$shell_plugins_aur_manifest"
+    dotfiles_confirm "Install the displayed AUR shell plugin packages."
+    dotfiles_install_arch_manifest "$shell_plugins_aur_manifest"
   fi
+  shell_plugins_zsh_paths
+  shell_plugins_antidote
+  [ -s "$shell_plugins_zsh_bundles" ] || dotfiles_die "Zsh plugin declaration is missing: $shell_plugins_zsh_bundles"
+  mkdir -p "${shell_plugins_zsh_static%/*}"
+  shell_plugins_stage=$(mktemp "${shell_plugins_zsh_static%/*}/.plugins.stage.XXXXXX")
+  trap 'rm -f "${shell_plugins_stage:-}"' 0 HUP INT TERM
+  ANTIDOTE_HOME="$shell_plugins_cache_home/antidote" zsh -fc "source \"$shell_plugins_antidote\"; antidote bundle < \"$shell_plugins_zsh_bundles\"" > "$shell_plugins_stage"
+  [ -s "$shell_plugins_stage" ] || dotfiles_die "Antidote did not generate a Zsh plugin loader."
+  mv -f "$shell_plugins_stage" "$shell_plugins_zsh_static"
+  shell_plugins_stage=
 }
 
 shell_plugins_plan() {
-  shell_plugins_root
-  shell_plugins_validate_lock
+  shell_plugins_fish_config
+  shell_plugins_zsh_paths
   printf '%s\n' "Fish plugins: $DOTFILES_REPO_ROOT/home/dot_config/fish/fish_plugins"
-  printf '%s\n' "Vendored Fisher: a04308be92daa6cfecdbb0ca58b1e8508664cff2"
-  printf '%s\n' "Zsh plugins: $shell_plugins_lock"
-  printf '%s\n' "Managed Zsh data: $shell_plugins_root_dir"
+  printf '%s\n' "Zsh plugins: $shell_plugins_zsh_bundles"
+  printf '%s\n' "Generated Zsh loader: $shell_plugins_zsh_static"
+  if [ "$(dotfiles_platform)" = arch ]; then
+    printf '%s\n' "AUR package: zsh-antidote"
+  fi
+  printf '%s\n' "Network access: Fisher and Antidote fetch missing pinned plugins."
 }
 
-shell_plugins_apply() {
-  shell_plugins_plan
-  shell_plugins_install_zsh
-  shell_plugins_install_fish
+shell_plugins_verify() {
+  shell_plugins_fish_config
+  shell_plugins_zsh_paths
+  if command -v fish >/dev/null 2>&1 && [ -f "$shell_plugins_fish_config/fish_plugins" ] && cmp -s "$DOTFILES_REPO_ROOT/home/dot_config/fish/fish_plugins" "$shell_plugins_fish_config/fish_plugins" && fish -c 'fisher list' >/dev/null 2>&1; then
+    result ok fish.plugins valid
+  else
+    result skip fish.plugins not-installed
+  fi
+  if [ -s "$shell_plugins_zsh_static" ]; then
+    result ok zsh.plugins "$shell_plugins_zsh_static"
+  else
+    result skip zsh.plugins not-installed
+  fi
 }
