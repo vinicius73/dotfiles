@@ -108,6 +108,7 @@ dotfiles_xdg_home() {
   case "$1" in
     XDG_DATA_HOME) dotfiles_path=${XDG_DATA_HOME:-$2} ;;
     XDG_BIN_HOME) dotfiles_path=${XDG_BIN_HOME:-$2} ;;
+    XDG_CACHE_HOME) dotfiles_path=${XDG_CACHE_HOME:-$2} ;;
     XDG_CONFIG_HOME) dotfiles_path=${XDG_CONFIG_HOME:-$2} ;;
     *) dotfiles_die "Unsupported XDG variable: $1" ;;
   esac

@@ -1,13 +1,11 @@
 #!/bin/sh
 
 shell_plugins_fish_config() {
-  shell_plugins_fish_config=${XDG_CONFIG_HOME:-$HOME/.config}/fish
-  dotfiles_absolute_path "$shell_plugins_fish_config"
+  shell_plugins_fish_config=$(dotfiles_xdg_home XDG_CONFIG_HOME "$HOME/.config")/fish
 }
 
 shell_plugins_zsh_paths() {
-  shell_plugins_cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
-  dotfiles_absolute_path "$shell_plugins_cache_home"
+  shell_plugins_cache_home=$(dotfiles_xdg_home XDG_CACHE_HOME "$HOME/.cache")
   shell_plugins_zsh_bundles="$DOTFILES_REPO_ROOT/home/dot_config/zsh/plugins.txt"
   shell_plugins_zsh_static="$shell_plugins_cache_home/dotfiles/zsh/plugins.zsh"
 }

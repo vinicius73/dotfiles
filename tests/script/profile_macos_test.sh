@@ -17,6 +17,12 @@ assert_contains "$output" "pokemonsay"
 output=$(PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan shell-plugins)
 assert_contains "$output" "Generated Zsh loader"
 
+if PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan unknown >/dev/null 2>&1; then
+  fail "unknown profile unexpectedly succeeded"
+else
+  [ "$?" -eq 2 ] || fail "unknown profile returned an unexpected status"
+fi
+
 if PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan rust >/dev/null 2>&1; then
   fail "rust plan unexpectedly succeeded on macOS"
 else

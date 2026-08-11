@@ -52,6 +52,7 @@ plan_profile() {
     rust) plan_packages rust; printf '%s\n' "Installs the stable Rust toolchain and rustfmt, clippy, rust-src." ;;
     shell) printf '%s\n' "Sets Fish as the login shell after separate confirmations." ;;
     shell-plugins) shell_plugins_plan ;;
+    *) usage >&2; exit 2 ;;
   esac
 }
 
@@ -97,7 +98,8 @@ apply_profile() {
       dotfiles_confirm "Change your login shell to $fish_bin."
       chsh -s "$fish_bin"
       ;;
-    shell-plugins) shell_plugins_plan; shell_plugins_install_fish; shell_plugins_install_zsh ;;
+    shell-plugins) shell_plugins_install_fish; shell_plugins_install_zsh ;;
+    *) usage >&2; exit 2 ;;
   esac
 }
 

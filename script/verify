@@ -30,7 +30,7 @@ if command -v chezmoi >/dev/null 2>&1; then
   fi
 fi
 
-mise_config=${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml
+mise_config=$(dotfiles_xdg_home XDG_CONFIG_HOME "$HOME/.config")/mise/config.toml
 if command -v mise >/dev/null 2>&1; then
   if [ -f "$mise_config" ]; then
     if mise config ls >/dev/null; then result ok mise.config "$mise_config"; else result fail mise.config invalid; fi
