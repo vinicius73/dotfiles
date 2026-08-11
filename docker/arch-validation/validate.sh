@@ -48,6 +48,7 @@ shellcheck -s sh \
 fish --no-execute \
   home/dot_config/fish/config.fish \
   home/dot_config/fish/conf.d/git-extras.fish \
+  home/dot_config/fish/functions/dotfiles_configure_shell.fish \
   home/dot_config/fish/functions/dotfiles_greeting.fish \
   home/dot_config/fish/functions/dotfiles_load_environment.fish \
   home/dot_config/fish/functions/fisher.fish

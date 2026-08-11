@@ -4,6 +4,7 @@ if status is-interactive
   end
 
   dotfiles_load_environment
+  dotfiles_configure_shell
 
   if not set -q MISE_SHELL; and type -q mise
     mise activate fish | source

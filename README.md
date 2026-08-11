@@ -69,18 +69,18 @@ mise doctor
 
 ## Shells
 
-Fish and Zsh use the same optional local environment directory: `~/.config/dotfiles/env.d`.
-
-Create the directory with strict permissions, then add literal `NAME=value` entries to `*.env` files:
+Bash, Fish, and Zsh load declared local secrets only in interactive sessions. Copy `~/.config/dotfiles/secrets.conf.example` to `~/.config/dotfiles/secrets.conf`, declare one variable name per line, then add literal `NAME=value` entries for those exact names to `~/.config/dotfiles/env.d/*.env`:
 
 ```sh
 mkdir -p ~/.config/dotfiles/env.d
 chmod 700 ~/.config/dotfiles ~/.config/dotfiles/env.d
-touch ~/.config/dotfiles/env.d/personal.env
-chmod 600 ~/.config/dotfiles/env.d/personal.env
+cp ~/.config/dotfiles/secrets.conf.example ~/.config/dotfiles/secrets.conf
+chmod 600 ~/.config/dotfiles/secrets.conf
 ```
 
-Files are ignored when their owner or permissions are unsafe. Values do not support quotes, expansion, commands, or multiline syntax. Keep high-privilege and short-lived credentials in the macOS Keychain and retrieve them only for the command that needs them.
+`secrets.conf` and `env.d` are local-only and ignored by Git. Files are ignored when their owner or permissions are unsafe. Values do not support quotes, expansion, commands, or multiline syntax, and undeclared names are rejected. On macOS, an unset declared name is looked up in Keychain using its name as the generic-password service and `$USER` as its account. No personal secret names or values are versioned.
+
+`EDITOR=micro`, `VISUAL`, Volta PATH removal, and mise activation are global shell behavior. Homebrew `mysql-client` PATH integration is macOS-only.
 
 Install the pinned Fish and Zsh plugins explicitly after reviewing the plan:
 
