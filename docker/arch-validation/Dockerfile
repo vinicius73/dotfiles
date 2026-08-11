@@ -1,0 +1,18 @@
+FROM archlinux:latest
+
+RUN sed -i 's/^#DisableSandbox/DisableSandbox/' /etc/pacman.conf \
+ && pacman -Syu --noconfirm --needed \
+    bash \
+    chezmoi \
+    fish \
+    git \
+    mise \
+    ruby \
+    shellcheck
+
+WORKDIR /workspace
+
+COPY validate.sh /usr/local/bin/dotfiles-validate
+RUN chmod 755 /usr/local/bin/dotfiles-validate
+
+ENTRYPOINT ["/usr/local/bin/dotfiles-validate"]

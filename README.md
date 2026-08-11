@@ -67,4 +67,20 @@ script/verify
 mise doctor
 ```
 
+## Validation
+
+Run the local shell validation suite with:
+
+```sh
+sh tests/run.sh
+```
+
+To run the same validation in an isolated Arch Linux container, start Docker and run:
+
+```sh
+script/validate-docker
+```
+
+The repository is mounted read-only and the container is removed after validation.
+
 See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), and [maintenance/README.md](maintenance/README.md) for operational details.
