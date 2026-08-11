@@ -2,6 +2,10 @@
 
 set -eu
 
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=maintenance/lib/common.sh
+. "$script_dir/lib/common.sh"
+
 usage() {
   printf '%s\n' "Usage: maintenance/clean-node-artifacts plan|apply --root DIRECTORY [--include-serverless]"
 }
@@ -19,10 +23,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 case "$mode" in plan|apply) ;; *) usage >&2; exit 2 ;; esac
-case "$root" in /*) ;; *) printf '%s\n' "Root must be an absolute path." >&2; exit 2 ;; esac
-[ -d "$root" ] && [ ! -L "$root" ] || { printf '%s\n' "Root must be a physical directory." >&2; exit 1; }
-root=$(CDPATH='' cd -- "$root" && pwd -P)
-case "$root" in /|"$HOME") printf '%s\n' "Refusing unsafe root: $root" >&2; exit 1 ;; esac
+root=$(maintenance_validate_root "$root") || exit "$?"
 
 list_targets() {
   find "$root" -type d \( -name node_modules -o -name .serverless \) -prune -print | while IFS= read -r target; do
@@ -39,16 +40,10 @@ targets=$(list_targets)
 if [ -n "$targets" ]; then printf '%s\n' "$targets"; else printf '%s\n' "No Node artifacts found."; fi
 [ "$mode" = plan ] && exit 0
 
-[ -t 0 ] && [ -t 1 ] || { printf '%s\n' "Apply requires an interactive terminal." >&2; exit 1; }
-printf '%s' "Type APPLY to remove the listed Node artifacts: "
-IFS= read -r answer < /dev/tty || exit 1
-[ "$answer" = APPLY ] || { printf '%s\n' "Operation cancelled." >&2; exit 1; }
+maintenance_confirm_apply "Type APPLY to remove the listed Node artifacts: " || exit "$?"
 
-status=0
-while IFS= read -r target; do
-  [ -n "$target" ] || continue
-  rm -rf "$target" || status=1
-done <<EOF
-$targets
-EOF
-exit "$status"
+remove_target() {
+  rm -rf "$1"
+}
+
+maintenance_run_targets "$targets" remove_target

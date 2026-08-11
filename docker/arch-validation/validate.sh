@@ -25,6 +25,7 @@ validate_shell_syntax() {
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
     script/libexec/pokemonsay-wrapper \
+    maintenance/lib/common.sh \
     maintenance/clean-node-artifacts \
     maintenance/clean-go-artifacts \
     maintenance/clean-rust-artifacts \
@@ -52,6 +53,7 @@ validate_shellcheck() {
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
     script/libexec/pokemonsay-wrapper \
+    maintenance/lib/common.sh \
     maintenance/clean-node-artifacts \
     maintenance/clean-go-artifacts \
     maintenance/clean-rust-artifacts \
