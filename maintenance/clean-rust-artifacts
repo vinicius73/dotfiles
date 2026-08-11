@@ -10,22 +10,58 @@ usage() {
   printf '%s\n' "Usage: maintenance/clean-rust-artifacts plan|apply --root DIRECTORY"
 }
 
-mode=${1:-}
-shift || true
+mode=
 root=
+
+if [ "$#" -gt 0 ]; then
+  mode=$1
+  shift
+fi
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --root) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; root=$2; shift 2 ;;
-    *) usage >&2; exit 2 ;;
+    --root)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      root=$2
+      shift 2
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
   esac
 done
-case "$mode" in plan|apply) ;; *) usage >&2; exit 2 ;; esac
+
+case "$mode" in
+  plan|apply) ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
 root=$(maintenance_validate_root "$root") || exit "$?"
 
 manifests=$(find "$root" \( -type d \( -name .git -o -name node_modules -o -name target \) -prune \) -o \( -type f -name Cargo.toml -print \))
-[ -n "$manifests" ] && printf '%s\n' "$manifests" || printf '%s\n' "No Cargo manifests found."
-[ "$mode" = plan ] && exit 0
-command -v cargo >/dev/null 2>&1 || { printf '%s\n' "cargo is required." >&2; exit 1; }
+
+if [ -n "$manifests" ]; then
+  printf '%s\n' "$manifests"
+else
+  printf '%s\n' "No Cargo manifests found."
+fi
+
+if [ "$mode" = plan ]; then
+  exit 0
+fi
+
+if ! command -v cargo >/dev/null 2>&1; then
+  printf '%s\n' "cargo is required." >&2
+  exit 1
+fi
+
 maintenance_confirm_apply "Type APPLY to run cargo clean for the listed manifests: " || exit "$?"
 
 clean_manifest() {

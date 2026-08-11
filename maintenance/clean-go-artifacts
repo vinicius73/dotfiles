@@ -10,22 +10,64 @@ usage() {
   printf '%s\n' "Usage: maintenance/clean-go-artifacts plan|apply --root DIRECTORY"
 }
 
-mode=${1:-}
-shift || true
+mode=
 root=
+
+if [ "$#" -gt 0 ]; then
+  mode=$1
+  shift
+fi
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --root) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; root=$2; shift 2 ;;
-    *) usage >&2; exit 2 ;;
+    --root)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      root=$2
+      shift 2
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
   esac
 done
-case "$mode" in plan|apply) ;; *) usage >&2; exit 2 ;; esac
+
+case "$mode" in
+  plan|apply) ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
 root=$(maintenance_validate_root "$root") || exit "$?"
 
-targets=$(find "$root" \( -type d \( -name .git -o -name node_modules -o -name target \) -prune \) -o \( -type f -name go.mod -exec dirname {} \; \))
-targets=$(printf '%s\n' "$targets" | while IFS= read -r project; do [ -d "$project/bin" ] && [ ! -L "$project/bin" ] && printf '%s\n' "$project/bin"; done)
-[ -n "$targets" ] && printf '%s\n' "$targets" || printf '%s\n' "No Go artifacts found."
-[ "$mode" = plan ] && exit 0
+list_targets() {
+  find "$root" \( -type d \( -name .git -o -name node_modules -o -name target \) -prune \) -o \( -type f -name go.mod -exec dirname {} \; \) |
+    while IFS= read -r project; do
+      target=$project/bin
+
+      if [ -d "$target" ] && [ ! -L "$target" ]; then
+        printf '%s\n' "$target"
+      fi
+    done
+}
+
+targets=$(list_targets)
+
+if [ -n "$targets" ]; then
+  printf '%s\n' "$targets"
+else
+  printf '%s\n' "No Go artifacts found."
+fi
+
+if [ "$mode" = plan ]; then
+  exit 0
+fi
+
 maintenance_confirm_apply "Type APPLY to remove the listed Go artifacts: " || exit "$?"
 
 remove_target() {

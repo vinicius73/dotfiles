@@ -10,45 +10,98 @@ usage() {
   printf '%s\n' "Usage: maintenance/audit-js-vulnerabilities audit|fix --root DIRECTORY [--severity LEVEL]"
 }
 
-mode=${1:-}
-shift || true
+mode=
 root=
 severity=moderate
+
+if [ "$#" -gt 0 ]; then
+  mode=$1
+  shift
+fi
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --root) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; root=$2; shift 2 ;;
-    --severity)
-      [ "$#" -ge 2 ] || { usage >&2; exit 2; }
-      severity=$2
-      case "$severity" in low|moderate|high|critical) ;; *) printf '%s\n' "Invalid severity: $severity" >&2; exit 2 ;; esac
+    --root)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      root=$2
       shift 2
       ;;
-    *) usage >&2; exit 2 ;;
+    --severity)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      severity=$2
+      shift 2
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
   esac
 done
-case "$mode" in audit|fix) ;; *) usage >&2; exit 2 ;; esac
+
+case "$mode" in
+  audit|fix) ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
+case "$severity" in
+  low|moderate|high|critical) ;;
+  *)
+    printf '%s\n' "Invalid severity: $severity" >&2
+    exit 2
+    ;;
+esac
+
 root=$(maintenance_validate_root "$root") || exit "$?"
 
 projects=$(find "$root" \( -type d \( -name .git -o -name node_modules \) -prune \) -o \( -type f -name package.json -exec dirname {} \; \))
-[ -n "$projects" ] && printf '%s\n' "$projects" || printf '%s\n' "No JavaScript projects found."
-[ "$mode" = audit ] || maintenance_confirm_apply "Type APPLY to run package-manager fixes in the listed projects: " Fix || exit "$?"
+
+if [ -n "$projects" ]; then
+  printf '%s\n' "$projects"
+else
+  printf '%s\n' "No JavaScript projects found."
+fi
+
+if [ "$mode" = fix ]; then
+  maintenance_confirm_apply "Type APPLY to run package-manager fixes in the listed projects: " Fix || exit "$?"
+fi
 
 audit_project() {
   project=$1
-  if [ -f "$project/pnpm-lock.yaml" ]; then manager=pnpm
-  elif [ -f "$project/bun.lockb" ] || [ -f "$project/bun.lock" ]; then manager=bun
-  elif [ -f "$project/yarn.lock" ]; then manager=yarn
-  elif [ -f "$project/package-lock.json" ]; then manager=npm
-  else manager=npm
+
+  if [ -f "$project/pnpm-lock.yaml" ]; then
+    manager=pnpm
+  elif [ -f "$project/bun.lockb" ] || [ -f "$project/bun.lock" ]; then
+    manager=bun
+  elif [ -f "$project/yarn.lock" ]; then
+    manager=yarn
+  else
+    manager=npm
   fi
-  command -v "$manager" >/dev/null 2>&1 || {
+
+  if ! command -v "$manager" >/dev/null 2>&1; then
     printf '%s\n' "Skipping $project: $manager is unavailable." >&2
     return 1
-  }
+  fi
+
   if [ "$mode" = audit ]; then
-    (cd "$project" && "$manager" audit --json --audit-level="$severity")
+    (
+      cd "$project"
+      "$manager" audit --json --audit-level="$severity"
+    )
   else
-    (cd "$project" && "$manager" audit fix --audit-level="$severity")
+    (
+      cd "$project"
+      "$manager" audit fix --audit-level="$severity"
+    )
   fi
 }
 
