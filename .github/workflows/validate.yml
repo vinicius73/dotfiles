@@ -1,0 +1,40 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shell:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install validation tools
+        run: brew install shellcheck chezmoi fish mise
+      - name: Validate shell scripts
+        run: |
+          sh -n script/bootstrap script/profile script/verify
+          bash -n home/dot_bashrc
+          shellcheck -s sh script/bootstrap script/profile script/verify
+          fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/linux.fish
+      - name: Validate Chezmoi source
+        run: |
+          temporary_home="$(mktemp -d)"
+          chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" apply
+          chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" verify
+      - name: Validate shell startup output
+        run: |
+          temporary_home="$(mktemp -d)"
+          chezmoi --source "$GITHUB_WORKSPACE/home" --destination "$temporary_home" apply
+          HOME="$temporary_home" bash --login -ic 'test "$ANSIBLE_NOCOWS" = 1' 2>/dev/null
+      - name: Validate mise configuration
+        run: |
+          temporary_config="$(mktemp -d)"
+          MISE_CONFIG_DIR="$temporary_config" mise trust "$GITHUB_WORKSPACE/home/dot_config/mise/config.toml"
+          MISE_CONFIG_DIR="$temporary_config" mise config ls --cd "$GITHUB_WORKSPACE/home/dot_config/mise"
+      - name: Validate Brewfiles
+        run: |
+          ruby -c Brewfile.base
+          ruby -c Brewfile.cli
+          ruby -c Brewfile.desktop
+          ruby -c Brewfile.docker

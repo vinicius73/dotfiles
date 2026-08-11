@@ -1,0 +1,13 @@
+if [[ $- != *i* ]]; then
+  return
+fi
+
+export ANSIBLE_NOCOWS=1
+
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash)"
+fi
+
+if command -v go-task >/dev/null 2>&1; then
+  alias task='go-task'
+fi

@@ -1,0 +1,44 @@
+#!/bin/sh
+
+set -eu
+
+status=0
+
+check_command() {
+  if command -v "$1" >/dev/null 2>&1; then
+    printf '%s\n' "ok: $1 -> $(command -v "$1")"
+  else
+    printf '%s\n' "missing: $1" >&2
+    status=1
+  fi
+}
+
+for command in chezmoi fish mise; do
+  check_command "$command"
+done
+
+if command -v chezmoi >/dev/null 2>&1 && [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/chezmoi" ]; then
+  chezmoi verify || status=1
+fi
+
+if command -v mise >/dev/null 2>&1 && [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml" ]; then
+  mise config ls || status=1
+fi
+
+case "$(uname -s)" in
+  Darwin)
+    for command in rustup cargo rustc; do
+      if command -v "$command" >/dev/null 2>&1; then
+        printf '%s\n' "unexpected Rust command on macOS: $command" >&2
+        status=1
+      fi
+    done
+    ;;
+  Linux)
+    if [ -e /etc/arch-release ] && command -v rustup >/dev/null 2>&1; then
+      pacman -Qo "$(command -v rustup)" || status=1
+    fi
+    ;;
+esac
+
+exit "$status"

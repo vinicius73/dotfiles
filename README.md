@@ -1,13 +1,65 @@
-# Installation Scripts Documentation
+# Dotfiles
 
-This repository contains various scripts to automate the installation and configuration of tools, environments, and utilities. Below is an overview of the scripts and their purposes.
+Cross-platform personal environment for macOS (Apple Silicon and Intel) and Arch Linux.
 
-## Archlinux
+## Supported platforms
 
-See the details on [`install/archlinux/README.md`](install/archlinux/README.md)
+- macOS `arm64` and `x86_64`
+- Arch Linux
 
-```bash
-bash install/archlinux.sh
-bash arch-enviroments.sh
-bash install-pokemonsay.sh
-``` 
+## Before the first install
+
+### macOS
+
+Install Xcode Command Line Tools and Homebrew in its default prefix. The bootstrap intentionally does not install Homebrew.
+
+### Arch Linux
+
+Use a fully updated Arch installation with a working `sudo`, `pacman`, and network connection.
+
+## Install
+
+Clone this repository, then run:
+
+```sh
+script/bootstrap
+```
+
+The default command is a safe plan. To install the base dependencies, inspect the Chezmoi diff, and optionally apply the configuration from an interactive terminal:
+
+```sh
+script/bootstrap --apply
+```
+
+The bootstrap intentionally has no non-interactive apply mode. Review the Chezmoi diff and confirm the interactive prompt before it changes home-directory files.
+The base profile installs only Git, Chezmoi, Fish, mise, certificates, Curl, and Bash. It does not install desktop apps, Docker, Rust, or change the login shell.
+
+## Profiles
+
+```sh
+script/profile list
+script/profile apply cli
+script/profile apply desktop
+script/profile apply docker
+script/profile apply rust
+script/profile apply shell
+```
+
+`rust` is Arch-only. `shell` is the only profile that can change the login shell, and always asks for confirmation.
+
+## Runtime ownership
+
+mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rust is intentionally excluded: on Arch, the `rust` profile installs `rustup` from pacman and configures its stable toolchain. Rust is not installed on macOS.
+
+## Local configuration
+
+Copy `~/.config/git/identity.local.example` to `~/.config/git/identity.local`, edit it with your identity, and do not commit the result. Existing personal configuration should be reviewed in `chezmoi diff` before it is applied.
+
+## Verification
+
+```sh
+script/verify
+mise doctor
+```
+
+See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), and [docs/migration.md](docs/migration.md) for operational details.

@@ -1,0 +1,7 @@
+bash
+ca-certificates
+chezmoi
+curl
+fish
+git
+mise

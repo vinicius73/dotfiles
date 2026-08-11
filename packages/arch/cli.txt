@@ -1,0 +1,5 @@
+fzf
+ghq
+jq
+ripgrep
+shellcheck

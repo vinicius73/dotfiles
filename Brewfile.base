@@ -1,0 +1,7 @@
+brew "bash"
+brew "ca-certificates"
+brew "chezmoi"
+brew "curl"
+brew "fish"
+brew "git"
+brew "mise"

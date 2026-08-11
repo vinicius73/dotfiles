@@ -1,0 +1,5 @@
+brew "fzf"
+brew "ghq"
+brew "jq"
+brew "ripgrep"
+brew "shellcheck"
