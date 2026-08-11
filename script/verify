@@ -36,7 +36,7 @@ case "$(uname -s)" in
     ;;
   Linux)
     if [ -e /etc/arch-release ] && command -v rustup >/dev/null 2>&1; then
-      pacman -Qo "$(command -v rustup)" || status=1
+      paru -Qo "$(command -v rustup)" || status=1
     fi
     ;;
 esac

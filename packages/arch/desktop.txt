@@ -1,5 +1,3 @@
 alacritty
 bruno
-code
-cursor
 zed

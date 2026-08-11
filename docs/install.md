@@ -12,10 +12,11 @@ The script locates an existing Homebrew executable from `PATH`, `/opt/homebrew/b
 ## Arch Linux
 
 1. Ensure `sudo`, `pacman`, network access, and a fully updated system are available.
-2. Clone this repository.
-3. Run `script/bootstrap --apply`.
+2. Install `paru` manually from the AUR after reviewing its PKGBUILD and source files.
+3. Clone this repository.
+4. Run `script/bootstrap --apply`.
 
-The Arch base install runs `pacman -Syu --needed` and may require manual intervention for normal system updates.
+The Arch base install runs `paru -Syu --needed` and may require manual intervention for normal system updates. `paru` handles official repositories through pacman and builds AUR packages locally; review every AUR PKGBUILD and source change before confirming an installation.
 
 ## Applying configuration
 

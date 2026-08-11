@@ -75,8 +75,8 @@ if [ "$platform" = macos ]; then
   "$brew_bin" bundle check --file "$repo_root/Brewfile.base" >/dev/null 2>&1 || \
     "$brew_bin" bundle install --file "$repo_root/Brewfile.base" --no-upgrade
 else
-  if ! command -v sudo >/dev/null 2>&1 || ! command -v pacman >/dev/null 2>&1; then
-    printf '%s\n' "Arch bootstrap requires sudo and pacman." >&2
+  if ! command -v paru >/dev/null 2>&1; then
+    printf '%s\n' "Arch bootstrap requires paru. Install it from the AUR after reviewing its PKGBUILD, then rerun this command." >&2
     exit 1
   fi
   printf '%s\n' "Arch packages will update the complete system before installing the base profile."
@@ -84,7 +84,7 @@ else
   while IFS= read -r package; do
     [ -n "$package" ] && set -- "$@" "$package"
   done < "$repo_root/packages/arch/base.txt"
-  sudo pacman -Syu --needed "$@"
+  paru -Syu --needed "$@"
 fi
 
 for command in chezmoi mise fish; do

@@ -23,11 +23,15 @@ esac
 install_arch_list() {
   list_file=$1
   [ -s "$list_file" ] || return 0
+  if ! command -v paru >/dev/null 2>&1; then
+    printf '%s\n' "Arch profiles require paru. Install it from the AUR after reviewing its PKGBUILD." >&2
+    exit 1
+  fi
   set --
   while IFS= read -r package; do
     [ -n "$package" ] && set -- "$@" "$package"
   done < "$list_file"
-  sudo pacman -S --needed "$@"
+  paru -S --needed "$@"
 }
 
 brew_bin() {
@@ -60,7 +64,7 @@ apply_profile() {
         install_brewfile "$repo_root/Brewfile.desktop"
       else
         install_arch_list "$repo_root/packages/arch/desktop.txt"
-        printf '%s\n' "AUR desktop packages are intentionally not installed automatically. Review packages/arch/aur-desktop.txt first."
+        install_arch_list "$repo_root/packages/arch/aur-desktop.txt"
       fi
       ;;
     docker)
@@ -113,7 +117,7 @@ case "${1:-}" in
     printf '%s\n' "cli      Cross-platform command-line tools"
     printf '%s\n' "desktop  Graphical applications"
     printf '%s\n' "docker   Docker tooling"
-    printf '%s\n' "rust     Arch Linux only: pacman rustup and stable toolchain"
+    printf '%s\n' "rust     Arch Linux only: paru rustup and stable toolchain"
     printf '%s\n' "shell    Explicitly set Fish as the login shell"
     ;;
   apply)

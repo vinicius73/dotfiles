@@ -8,7 +8,7 @@ Installs curated command-line tools. It does not affect shell ownership or langu
 
 ## desktop
 
-Installs curated graphical applications. On Arch, AUR packages are listed separately and are never installed automatically.
+Installs curated graphical applications. On Arch, paru installs the official-repository manifest and the separate AUR manifest. Review AUR PKGBUILDs and source changes before confirming the installation.
 
 ## docker
 
@@ -16,7 +16,7 @@ Installs Docker tooling. On macOS, Docker Desktop must be started and configured
 
 ## rust
 
-Available only on Arch. pacman installs `rustup`; rustup configures the stable toolchain and `rustfmt`, `clippy`, and `rust-src` components. The profile never runs `rustup self update`.
+Available only on Arch. paru installs `rustup`; rustup configures the stable toolchain and `rustfmt`, `clippy`, and `rust-src` components. The profile never runs `rustup self update`.
 
 ## shell
 

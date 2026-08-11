@@ -15,7 +15,7 @@ Install Xcode Command Line Tools and Homebrew in its default prefix. The bootstr
 
 ### Arch Linux
 
-Use a fully updated Arch installation with a working `sudo`, `pacman`, and network connection.
+Use a fully updated Arch installation with a working `sudo`, `pacman`, and network connection. Install `paru` manually from the AUR after reviewing its PKGBUILD before running this repository's bootstrap.
 
 ## Install
 
@@ -34,6 +34,8 @@ script/bootstrap --apply
 The bootstrap intentionally has no non-interactive apply mode. Review the Chezmoi diff and confirm the interactive prompt before it changes home-directory files.
 The base profile installs only Git, Chezmoi, Fish, mise, certificates, Curl, and Bash. It does not install desktop apps, Docker, Rust, or change the login shell.
 
+On Arch, `paru` installs both official-repository packages and the explicitly listed AUR desktop packages. Review AUR PKGBUILDs and source changes at each prompt before accepting them; the scripts never use `--noconfirm` or disable signature or checksum verification.
+
 ## Profiles
 
 ```sh
@@ -49,7 +51,7 @@ script/profile apply shell
 
 ## Runtime ownership
 
-mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rust is intentionally excluded: on Arch, the `rust` profile installs `rustup` from pacman and configures its stable toolchain. Rust is not installed on macOS.
+mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rust is intentionally excluded: on Arch, the `rust` profile installs `rustup` through paru and configures its stable toolchain. Rust is not installed on macOS.
 
 ## Local configuration
 
