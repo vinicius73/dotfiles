@@ -3,7 +3,7 @@
 set -eu
 
 usage() {
-  printf '%s\n' "Usage: script/profile list | script/profile apply <cli|desktop|docker|rust|shell>"
+  printf '%s\n' "Usage: script/profile list | script/profile apply <cli|desktop|docker|pokemonsay|rust|shell>"
 }
 
 script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
@@ -77,6 +77,75 @@ apply_profile() {
         printf '%s\n' "Adding a user to the docker group grants root-equivalent access and is intentionally manual."
       fi
       ;;
+    pokemonsay)
+      source_url=https://github.com/HRKings/pokemonsay-newgenerations.git
+      source_commit=f8a24a05dd3330fac2a75fdbaf19f72948cedfb3
+      data_dir=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/pokemonsay
+      marker="$data_dir/.dotfiles-pokemonsay"
+      if [ -e "$data_dir" ] && { [ ! -d "$data_dir" ] || [ -L "$data_dir" ]; }; then
+        printf '%s\n' "Refusing to replace invalid pokemonsay data path: $data_dir" >&2
+        exit 1
+      fi
+      if [ -e "$data_dir" ] && [ ! -f "$marker" ]; then
+        printf '%s\n' "Refusing to replace unmanaged pokemonsay data: $data_dir" >&2
+        exit 1
+      fi
+      if [ -e "$data_dir" ] && ! git -C "$data_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        printf '%s\n' "Refusing to replace invalid pokemonsay data: $data_dir" >&2
+        exit 1
+      fi
+      if [ -e "$data_dir" ] && ! git -C "$data_dir" remote get-url origin | grep -Fx "$source_url" >/dev/null; then
+        printf '%s\n' "Refusing to replace pokemonsay data from an unexpected source: $data_dir" >&2
+        exit 1
+      fi
+      if [ -e "$data_dir" ] && ! git -C "$data_dir" diff --quiet; then
+        printf '%s\n' "Refusing to replace modified pokemonsay data: $data_dir" >&2
+        exit 1
+      fi
+      if [ -e "$data_dir" ] && ! git -C "$data_dir" diff --cached --quiet; then
+        printf '%s\n' "Refusing to replace modified pokemonsay data: $data_dir" >&2
+        exit 1
+      fi
+      if [ -e "$data_dir" ]; then
+        unmanaged_files=$(git -C "$data_dir" status --porcelain --untracked-files=all | grep -v -E '^\?\? (pokemonsay|\.dotfiles-pokemonsay)$' || true)
+        if [ -n "$unmanaged_files" ]; then
+          printf '%s\n' "Refusing to replace modified pokemonsay data: $data_dir" >&2
+          exit 1
+        fi
+      fi
+      bin_dir=${XDG_BIN_HOME:-$HOME/.local/bin}
+      launcher="$bin_dir/pokemonsay"
+      if [ -e "$launcher" ] && [ ! -L "$launcher" ]; then
+        printf '%s\n' "Refusing to replace non-symlink launcher: $launcher" >&2
+        exit 1
+      fi
+      if [ -L "$launcher" ] && [ "$(readlink "$launcher")" != "$data_dir/pokemonsay" ]; then
+        printf '%s\n' "Refusing to replace unmanaged pokemonsay launcher: $launcher" >&2
+        exit 1
+      fi
+      if [ "$platform" = macos ]; then
+        install_brewfile "$repo_root/Brewfile.pokemonsay"
+      else
+        install_arch_list "$repo_root/packages/arch/pokemonsay.txt"
+      fi
+      command -v git >/dev/null 2>&1 || { printf '%s\n' "pokemonsay requires git." >&2; exit 1; }
+      temporary_data_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-pokemonsay.XXXXXX")
+      trap 'rm -rf "$temporary_data_dir"' EXIT HUP INT TERM
+      git clone --no-checkout "$source_url" "$temporary_data_dir"
+      git -C "$temporary_data_dir" checkout --detach "$source_commit"
+      test "$(git -C "$temporary_data_dir" rev-parse HEAD)" = "$source_commit" || { printf '%s\n' "pokemonsay source did not resolve to the required commit." >&2; exit 1; }
+      test -d "$temporary_data_dir/pokemons" || { printf '%s\n' "pokemonsay source payload is incomplete." >&2; exit 1; }
+      test -x "$repo_root/script/pokemonsay" || { printf '%s\n' "Managed pokemonsay wrapper is unavailable." >&2; exit 1; }
+      : > "$temporary_data_dir/.dotfiles-pokemonsay"
+      cp "$repo_root/script/pokemonsay" "$temporary_data_dir/pokemonsay"
+      chmod 755 "$temporary_data_dir/pokemonsay"
+      mkdir -p "$(dirname "$data_dir")" "$bin_dir"
+      rm -rf "$data_dir"
+      mv "$temporary_data_dir" "$data_dir"
+      trap - EXIT HUP INT TERM
+      ln -sfn "$data_dir/pokemonsay" "$launcher"
+      printf '%s\n' "pokemonsay is available at $launcher. Add $bin_dir to PATH before using it."
+      ;;
     rust)
       if [ "$platform" != arch ]; then
         printf '%s\n' "The rust profile is supported only on Arch Linux." >&2
@@ -117,6 +186,7 @@ case "${1:-}" in
     printf '%s\n' "cli      Cross-platform command-line tools"
     printf '%s\n' "desktop  Graphical applications"
     printf '%s\n' "docker   Docker tooling"
+    printf '%s\n' "pokemonsay  Install the optional Pokémon quote renderer"
     printf '%s\n' "rust     Arch Linux only: paru rustup and stable toolchain"
     printf '%s\n' "shell    Explicitly set Fish as the login shell"
     ;;

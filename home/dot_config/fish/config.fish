@@ -11,3 +11,5 @@ if type -q eza
   alias la "eza -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso -a"
   alias lla "ll -a"
 end
+
+dotfiles_greeting

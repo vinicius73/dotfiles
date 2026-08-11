@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -eu
+
+usage() {
+  printf '%s\n' "Usage: pokemonsay [-f cowfile] [message]"
+}
+
+script_path=$0
+while [ -L "$script_path" ]; do
+  link=$(readlink "$script_path")
+  case "$link" in
+    /*) script_path=$link ;;
+    *) script_path=$(dirname -- "$script_path")/$link ;;
+  esac
+done
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$script_path")" && pwd)
+cow_dir="$script_dir/pokemons"
+cow_file=
+
+if [ "${1:-}" = -f ]; then
+  [ "$#" -ge 2 ] || { usage >&2; exit 2; }
+  cow_file=$2
+  shift 2
+fi
+
+if [ -n "$cow_file" ]; then
+  case "$cow_file" in
+    */*|.*|*'..'*)
+      printf '%s\n' "Invalid cowfile." >&2
+      exit 2
+      ;;
+  esac
+
+  case "$cow_file" in
+    *.cow) ;;
+    *)
+      printf '%s\n' "Cowfile must end in .cow." >&2
+      exit 2
+      ;;
+  esac
+
+  cow_path="$cow_dir/$cow_file"
+  [ -f "$cow_path" ] || { printf '%s\n' "Cowfile is unavailable." >&2; exit 1; }
+else
+  cow_path=$(LC_ALL=C find "$cow_dir" -type f -name '*.cow' -print | LC_ALL=C awk 'BEGIN { srand() } { if (rand() < 1 / NR) selected = $0 } END { print selected }')
+  [ -n "$cow_path" ] || { printf '%s\n' "No cowfiles are available." >&2; exit 1; }
+fi
+
+command -v cowsay >/dev/null 2>&1 || { printf '%s\n' "cowsay is required." >&2; exit 1; }
+
+if [ "$#" -gt 0 ]; then
+  cowsay -f "$cow_path" "$*"
+else
+  cowsay -f "$cow_path"
+fi

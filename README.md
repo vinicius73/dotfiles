@@ -43,11 +43,14 @@ script/profile list
 script/profile apply cli
 script/profile apply desktop
 script/profile apply docker
+script/profile apply pokemonsay
 script/profile apply rust
 script/profile apply shell
 ```
 
-`rust` is Arch-only. `shell` is the only profile that can change the login shell, and always asks for confirmation.
+`rust` is Arch-only. `shell` is the only profile that can change the login shell, and always asks for confirmation. `pokemonsay` is optional and installs a commit-pinned upstream payload without executing its installer.
+
+The Fish greeting is disabled by default. Enable it only in a trusted local terminal with `set -gx DOTFILES_GREETING 1`; use `set -gx DOTFILES_GREETING_DISABLE 1` to suppress it for a session.
 
 ## Runtime ownership
 
