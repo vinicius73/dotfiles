@@ -13,4 +13,4 @@ printf '#!/bin/sh\nexit 0\n' > "$temporary_dir/bin/brew"
 chmod 755 "$temporary_dir/bin/uname" "$temporary_dir/bin/brew"
 output=$(PATH="$temporary_dir/bin:$PATH" "$repo_root/script/bootstrap" plan)
 assert_contains "$output" "Platform: macos"
-assert_contains "$output" "Base Brewfile"
+assert_contains "$output" "packages/macos/base.Brewfile"

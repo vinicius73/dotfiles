@@ -4,6 +4,8 @@ set -eu
 
 script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 repo_root=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+DOTFILES_REPO_ROOT=$repo_root
+export DOTFILES_REPO_ROOT
 . "$repo_root/script/lib/dotfiles.sh"
 
 usage() {
@@ -19,10 +21,7 @@ validate_repository() {
 }
 
 base_manifest() {
-  case "$platform" in
-    macos) printf '%s\n' "$repo_root/Brewfile.base" ;;
-    arch) printf '%s\n' "$repo_root/packages/arch/base.txt" ;;
-  esac
+  dotfiles_manifest_path base "$platform" || dotfiles_die "Base profile is unsupported on $platform."
 }
 
 configured_chezmoi_source() {

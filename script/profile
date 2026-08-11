@@ -18,18 +18,7 @@ profile_platform() {
 }
 
 profile_manifest() {
-  case "$1:$platform" in
-    cli:macos) printf '%s\n' "$repo_root/Brewfile.cli" ;;
-    cli:arch) printf '%s\n' "$repo_root/packages/arch/cli.txt" ;;
-    desktop:macos) printf '%s\n' "$repo_root/Brewfile.desktop" ;;
-    desktop:arch) printf '%s\n' "$repo_root/packages/arch/desktop.txt" ;;
-    docker:macos) printf '%s\n' "$repo_root/Brewfile.docker" ;;
-    docker:arch) printf '%s\n' "$repo_root/packages/arch/docker.txt" ;;
-    pokemonsay:macos) printf '%s\n' "$repo_root/Brewfile.pokemonsay" ;;
-    pokemonsay:arch) printf '%s\n' "$repo_root/packages/arch/pokemonsay.txt" ;;
-    rust:arch) printf '%s\n' "$repo_root/packages/arch/rust.txt" ;;
-    *) return 1 ;;
-  esac
+  dotfiles_manifest_path "$1" "$platform"
 }
 
 plan_packages() {

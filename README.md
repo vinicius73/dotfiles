@@ -67,4 +67,4 @@ script/verify
 mise doctor
 ```
 
-See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), and [docs/migration.md](docs/migration.md) for operational details.
+See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), [maintenance/README.md](maintenance/README.md), and [docs/migration.md](docs/migration.md) for operational details.

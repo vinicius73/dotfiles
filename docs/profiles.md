@@ -4,7 +4,7 @@ Profiles are intentionally planned and applied one at a time. Use `script/profil
 
 ## cli
 
-Installs curated command-line tools. It does not affect shell ownership or language runtimes.
+Installs curated command-line tools. On Arch, it also installs `git-extras` for the managed Fish integration. It does not affect shell ownership or language runtimes.
 
 ## desktop
 

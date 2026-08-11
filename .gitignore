@@ -5,4 +5,4 @@ sublime/Packages/User/*.merged-ca-bundle
 sublime/Packages/User/*.user-ca-bundle
 google-cloud-sdk/
 bash/envs.bash
-config/git/identity.local
+home/dot_config/git/identity.local

@@ -16,7 +16,7 @@ jobs:
           sh -n script/bootstrap script/profile script/verify script/lib/dotfiles.sh script/lib/pokemonsay.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities
           bash -n home/dot_bashrc scripts/*.sh
           shellcheck -s sh script/bootstrap script/profile script/verify script/lib/dotfiles.sh script/lib/pokemonsay.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities
-          fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/linux.fish home/dot_config/fish/functions/dotfiles_greeting.fish
+          fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/git-extras.fish home/dot_config/fish/functions/dotfiles_greeting.fish
       - name: Run shell tests
         run: sh tests/run.sh
       - name: Validate Chezmoi source and shell startup output
@@ -32,8 +32,8 @@ jobs:
           MISE_CONFIG_DIR="$temporary_config" mise config ls --cd "$GITHUB_WORKSPACE/home/dot_config/mise"
       - name: Validate Brewfiles
         run: |
-          ruby -c Brewfile.base
-          ruby -c Brewfile.cli
-          ruby -c Brewfile.desktop
-          ruby -c Brewfile.docker
-          ruby -c Brewfile.pokemonsay
+          ruby -c packages/macos/base.Brewfile
+          ruby -c packages/macos/cli.Brewfile
+          ruby -c packages/macos/desktop.Brewfile
+          ruby -c packages/macos/docker.Brewfile
+          ruby -c packages/macos/pokemonsay.Brewfile

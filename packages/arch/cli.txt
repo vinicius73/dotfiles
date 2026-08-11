@@ -1,5 +1,6 @@
 fzf
 ghq
+git-extras
 jq
 ripgrep
 shellcheck

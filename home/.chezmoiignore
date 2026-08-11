@@ -1,3 +1,3 @@
 {{ if ne .chezmoi.os "linux" }}
-.config/fish/conf.d/linux.fish
+.config/fish/conf.d/git-extras.fish
 {{ end }}
