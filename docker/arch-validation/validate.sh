@@ -21,7 +21,11 @@ validate_shell_syntax() {
     script/profile \
     script/verify \
     script/validate-docker \
-    script/lib/dotfiles.sh \
+    script/lib/core.sh \
+    script/lib/platform.sh \
+    script/lib/xdg.sh \
+    script/lib/manifests.sh \
+    script/lib/packages.sh \
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
     script/libexec/pokemonsay-wrapper \
@@ -49,7 +53,11 @@ validate_shellcheck() {
     script/profile \
     script/verify \
     script/validate-docker \
-    script/lib/dotfiles.sh \
+    script/lib/core.sh \
+    script/lib/platform.sh \
+    script/lib/xdg.sh \
+    script/lib/manifests.sh \
+    script/lib/packages.sh \
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
     script/libexec/pokemonsay-wrapper \

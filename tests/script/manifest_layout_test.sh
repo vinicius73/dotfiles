@@ -4,7 +4,8 @@ set -eu
 
 repo_root=$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd -P)
 . "$repo_root/tests/lib/assert.sh"
-. "$repo_root/script/lib/dotfiles.sh"
+. "$repo_root/script/lib/core.sh"
+. "$repo_root/script/lib/manifests.sh"
 
 DOTFILES_REPO_ROOT=$repo_root
 export DOTFILES_REPO_ROOT

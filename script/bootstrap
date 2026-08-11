@@ -6,7 +6,10 @@ script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 repo_root=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
 DOTFILES_REPO_ROOT=$repo_root
 export DOTFILES_REPO_ROOT
-. "$repo_root/script/lib/dotfiles.sh"
+. "$repo_root/script/lib/core.sh"
+. "$repo_root/script/lib/platform.sh"
+. "$repo_root/script/lib/manifests.sh"
+. "$repo_root/script/lib/packages.sh"
 
 usage() {
   printf '%s\n' "Usage: script/bootstrap plan | apply [--system-upgrade] | adopt-source"

@@ -7,7 +7,11 @@ status=0
 script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 DOTFILES_REPO_ROOT=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
 export DOTFILES_REPO_ROOT
-. "$DOTFILES_REPO_ROOT/script/lib/dotfiles.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/core.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/platform.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/xdg.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/manifests.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/packages.sh"
 . "$DOTFILES_REPO_ROOT/script/lib/shell-plugins.sh"
 
 result() {
