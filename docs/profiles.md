@@ -1,6 +1,6 @@
 # Profiles
 
-Profiles are intentionally applied one at a time.
+Profiles are intentionally planned and applied one at a time. Use `script/profile plan <profile>` to inspect package, network, privilege, and managed-path effects before `script/profile apply <profile>`.
 
 ## cli
 
@@ -16,7 +16,7 @@ Installs Docker tooling. On macOS, Docker Desktop must be started and configured
 
 ## pokemonsay
 
-Installs `cowsay` from Homebrew or Arch's official repositories, then clones [`HRKings/pokemonsay-newgenerations`](https://github.com/HRKings/pokemonsay-newgenerations) at commit `f8a24a05dd3330fac2a75fdbaf19f72948cedfb3` into `${XDG_DATA_HOME:-~/.local/share}/dotfiles/pokemonsay`. It verifies the checked-out commit, replaces the upstream executable with the repository-owned portable wrapper, and creates a managed launcher at `${XDG_BIN_HOME:-~/.local/bin}/pokemonsay`.
+Installs `cowsay` from Homebrew or Arch's official repositories, then clones [`HRKings/pokemonsay-newgenerations`](https://github.com/HRKings/pokemonsay-newgenerations) at commit `f8a24a05dd3330fac2a75fdbaf19f72948cedfb3` into `${XDG_DATA_HOME:-~/.local/share}/dotfiles/pokemonsay`. It verifies the checked-out commit, keeps the upstream checkout intact, adds a repository-owned wrapper named `dotfiles-pokemonsay`, and creates a managed launcher at `${XDG_BIN_HOME:-~/.local/bin}/pokemonsay`.
 
 The profile never executes the upstream installer, uses `sudo`, or updates from an upstream branch. Reapplying it refuses to replace unmanaged, unexpected-source, or locally modified data and refuses unmanaged launchers. The upstream commit is immutable but unsigned; review it and its artwork provenance before changing the pin.
 

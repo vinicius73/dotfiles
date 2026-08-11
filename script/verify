@@ -4,41 +4,62 @@ set -eu
 
 status=0
 
-check_command() {
-  if path=$(command -v "$1"); then
-    printf '%s\n' "ok: $1 -> $path"
-  else
-    printf '%s\n' "missing: $1" >&2
-    status=1
-  fi
+result() {
+  printf '%-5s %s %s\n' "$1" "$2" "$3"
+  [ "$1" != fail ] || status=1
 }
 
-for command in chezmoi fish mise; do
-  check_command "$command"
-done
+check_command() {
+  if path=$(command -v "$1"); then result ok "base.command.$1" "$path"; else result fail "base.command.$1" missing; fi
+}
 
-if command -v chezmoi >/dev/null 2>&1 && [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/chezmoi" ]; then
-  chezmoi verify || status=1
+for command in chezmoi fish mise; do check_command "$command"; done
+
+if command -v chezmoi >/dev/null 2>&1; then
+  chezmoi_source=$(chezmoi source-path 2>/dev/null || true)
+  if [ -n "$chezmoi_source" ] && [ -d "$chezmoi_source" ]; then
+    if chezmoi verify; then result ok chezmoi.verify valid; else result fail chezmoi.verify invalid; fi
+  else
+    result fail chezmoi.source missing
+  fi
 fi
 
-if command -v mise >/dev/null 2>&1 && [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml" ]; then
-  mise config ls || status=1
+mise_config=${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml
+if command -v mise >/dev/null 2>&1; then
+  if [ -f "$mise_config" ]; then
+    if mise config ls >/dev/null; then result ok mise.config "$mise_config"; else result fail mise.config invalid; fi
+  else
+    result fail mise.config missing
+  fi
 fi
 
 case "$(uname -s)" in
   Darwin)
     for command in rustup cargo rustc; do
-      if command -v "$command" >/dev/null 2>&1; then
-        printf '%s\n' "unexpected Rust command on macOS: $command" >&2
-        status=1
-      fi
+      if command -v "$command" >/dev/null 2>&1; then result fail "macos.rust.$command" unexpected; fi
     done
     ;;
   Linux)
-    if [ -e /etc/arch-release ] && command -v rustup >/dev/null 2>&1; then
-      paru -Qo "$(command -v rustup)" || status=1
+    if [ -e "${DOTFILES_ARCH_RELEASE_FILE:-/etc/arch-release}" ]; then
+      if command -v rustup >/dev/null 2>&1; then
+        if command -v pacman >/dev/null 2>&1; then
+          if pacman -Qo "$(command -v rustup)" >/dev/null; then result ok arch.rust.owner rustup; else result fail arch.rust.owner invalid; fi
+        else
+          result fail arch.pacman missing
+        fi
+      else
+        result skip arch.rust.owner rustup-not-installed
+      fi
     fi
     ;;
 esac
+
+pokemonsay_data=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/pokemonsay
+pokemonsay_bin=${XDG_BIN_HOME:-$HOME/.local/bin}/pokemonsay
+if [ -e "$pokemonsay_data" ] || [ -e "$pokemonsay_bin" ]; then
+  if [ -f "$pokemonsay_data/.dotfiles-pokemonsay" ] && [ -x "$pokemonsay_data/dotfiles-pokemonsay" ] && [ -L "$pokemonsay_bin" ] && [ "$(readlink "$pokemonsay_bin")" = "$pokemonsay_data/dotfiles-pokemonsay" ]; then result ok pokemonsay.profile valid; else result fail pokemonsay.profile invalid; fi
+else
+  result skip pokemonsay.profile not-installed
+fi
 
 exit "$status"

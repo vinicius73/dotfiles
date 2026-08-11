@@ -9,8 +9,17 @@ function dotfiles_greeting
     set -q $variable; and return
   end
 
+  test "$TERM" != dumb; or return
   test "$TERM_PROGRAM" != vscode; or return
-  type -q pokemonsay; or return
+
+  set -l bin_root "$XDG_BIN_HOME"
+  test -n "$bin_root"; or set bin_root "$HOME/.local/bin"
+  set -l data_root "$XDG_DATA_HOME"
+  test -n "$data_root"; or set data_root "$HOME/.local/share"
+  set -l launcher "$bin_root/pokemonsay"
+  set -l wrapper "$data_root/dotfiles/pokemonsay/dotfiles-pokemonsay"
+  test -L "$launcher"; and test (readlink "$launcher") = "$wrapper"; or return
+  test -x "$wrapper"; or return
 
   set -l config_dir (path dirname (status filename))
   set -l quote_file "$config_dir/../quotes.txt"
@@ -22,7 +31,6 @@ function dotfiles_greeting
   end < "$quote_file"
   test (count $quotes) -gt 0; or return
 
-  set -gx DOTFILES_GREETING_SHOWN 1
   set -l quote_index (random 1 (count $quotes))
-  printf '%s\n' "$quotes[$quote_index]" | command pokemonsay >/dev/tty 2>/dev/null
+  printf '%s\n' "$quotes[$quote_index]" | "$launcher" >/dev/tty 2>/dev/null; and set -gx DOTFILES_GREETING_SHOWN 1
 end

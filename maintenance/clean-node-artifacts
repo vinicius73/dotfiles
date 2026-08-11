@@ -1,0 +1,54 @@
+#!/bin/sh
+
+set -eu
+
+usage() {
+  printf '%s\n' "Usage: maintenance/clean-node-artifacts plan|apply --root DIRECTORY [--include-serverless]"
+}
+
+mode=${1:-}
+shift || true
+root=
+include_serverless=false
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --root) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; root=$2; shift 2 ;;
+    --include-serverless) include_serverless=true; shift ;;
+    *) usage >&2; exit 2 ;;
+  esac
+done
+
+case "$mode" in plan|apply) ;; *) usage >&2; exit 2 ;; esac
+case "$root" in /*) ;; *) printf '%s\n' "Root must be an absolute path." >&2; exit 2 ;; esac
+[ -d "$root" ] && [ ! -L "$root" ] || { printf '%s\n' "Root must be a physical directory." >&2; exit 1; }
+root=$(CDPATH='' cd -- "$root" && pwd -P)
+case "$root" in /|"$HOME") printf '%s\n' "Refusing unsafe root: $root" >&2; exit 1 ;; esac
+
+list_targets() {
+  find "$root" -type d \( -name node_modules -o -name .serverless \) -prune -print | while IFS= read -r target; do
+    project=${target%/*}
+    [ -f "$project/package.json" ] && [ ! -L "$target" ] || continue
+    case "${target##*/}" in
+      node_modules) printf '%s\n' "$target" ;;
+      .serverless) [ "$include_serverless" = true ] && printf '%s\n' "$target" ;;
+    esac
+  done
+}
+
+targets=$(list_targets)
+if [ -n "$targets" ]; then printf '%s\n' "$targets"; else printf '%s\n' "No Node artifacts found."; fi
+[ "$mode" = plan ] && exit 0
+
+[ -t 0 ] && [ -t 1 ] || { printf '%s\n' "Apply requires an interactive terminal." >&2; exit 1; }
+printf '%s' "Type APPLY to remove the listed Node artifacts: "
+IFS= read -r answer < /dev/tty || exit 1
+[ "$answer" = APPLY ] || { printf '%s\n' "Operation cancelled." >&2; exit 1; }
+
+status=0
+while IFS= read -r target; do
+  [ -n "$target" ] || continue
+  rm -rf "$target" || status=1
+done <<EOF
+$targets
+EOF
+exit "$status"

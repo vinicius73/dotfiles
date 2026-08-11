@@ -22,16 +22,16 @@ Use a fully updated Arch installation with a working `sudo`, `pacman`, and netwo
 Clone this repository, then run:
 
 ```sh
-script/bootstrap
+script/bootstrap plan
 ```
 
-The default command is a safe plan. To install the base dependencies, inspect the Chezmoi diff, and optionally apply the configuration from an interactive terminal:
+To install the base dependencies from an interactive terminal:
 
 ```sh
-script/bootstrap --apply
+script/bootstrap apply
 ```
 
-The bootstrap intentionally has no non-interactive apply mode. Review the Chezmoi diff and confirm the interactive prompt before it changes home-directory files.
+The bootstrap has no non-interactive apply mode. `apply` confirms package installation before it changes packages, then confirms Chezmoi source adoption and the reviewed configuration diff separately. On Arch, `--system-upgrade` is required to perform a full system update.
 The base profile installs only Git, Chezmoi, Fish, mise, certificates, Curl, and Bash. It does not install desktop apps, Docker, Rust, or change the login shell.
 
 On Arch, `paru` installs both official-repository packages and the explicitly listed AUR desktop packages. Review AUR PKGBUILDs and source changes at each prompt before accepting them; the scripts never use `--noconfirm` or disable signature or checksum verification.

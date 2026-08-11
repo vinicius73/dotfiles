@@ -2,180 +2,110 @@
 
 set -eu
 
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+repo_root=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+DOTFILES_REPO_ROOT=$repo_root
+export DOTFILES_REPO_ROOT
+. "$repo_root/script/lib/dotfiles.sh"
+. "$repo_root/script/lib/pokemonsay.sh"
+
 usage() {
-  printf '%s\n' "Usage: script/profile list | script/profile apply <cli|desktop|docker|pokemonsay|rust|shell>"
+  printf '%s\n' "Usage: script/profile list | plan <cli|desktop|docker|pokemonsay|rust|shell> | apply <cli|desktop|docker|pokemonsay|rust|shell>"
 }
 
-script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
-repo_root=$(CDPATH='' cd -- "$script_dir/.." && pwd)
-
-os=$(uname -s)
-arch=$(uname -m)
-case "$os:$arch" in
-  Darwin:arm64|Darwin:x86_64) platform=macos ;;
-  Linux:*)
-    [ -e /etc/arch-release ] || { printf '%s\n' "Unsupported Linux distribution. Only Arch Linux is supported." >&2; exit 1; }
-    platform=arch
-    ;;
-  *) printf '%s\n' "Unsupported platform: $os $arch" >&2; exit 1 ;;
-esac
-
-install_arch_list() {
-  list_file=$1
-  [ -s "$list_file" ] || return 0
-  if ! command -v paru >/dev/null 2>&1; then
-    printf '%s\n' "Arch profiles require paru. Install it from the AUR after reviewing its PKGBUILD." >&2
-    exit 1
-  fi
-  set --
-  while IFS= read -r package; do
-    [ -n "$package" ] && set -- "$@" "$package"
-  done < "$list_file"
-  paru -S --needed "$@"
+profile_platform() {
+  platform=$(dotfiles_platform)
 }
 
-brew_bin() {
-  command -v brew || {
-    for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
-      [ -x "$candidate" ] && { printf '%s\n' "$candidate"; return 0; }
-    done
-    return 1
-  }
+profile_manifest() {
+  case "$1:$platform" in
+    cli:macos) printf '%s\n' "$repo_root/Brewfile.cli" ;;
+    cli:arch) printf '%s\n' "$repo_root/packages/arch/cli.txt" ;;
+    desktop:macos) printf '%s\n' "$repo_root/Brewfile.desktop" ;;
+    desktop:arch) printf '%s\n' "$repo_root/packages/arch/desktop.txt" ;;
+    docker:macos) printf '%s\n' "$repo_root/Brewfile.docker" ;;
+    docker:arch) printf '%s\n' "$repo_root/packages/arch/docker.txt" ;;
+    pokemonsay:macos) printf '%s\n' "$repo_root/Brewfile.pokemonsay" ;;
+    pokemonsay:arch) printf '%s\n' "$repo_root/packages/arch/pokemonsay.txt" ;;
+    rust:arch) printf '%s\n' "$repo_root/packages/arch/rust.txt" ;;
+    *) return 1 ;;
+  esac
 }
 
-install_brewfile() {
-  brew=$(brew_bin)
-  "$brew" bundle check --file "$1" >/dev/null 2>&1 || \
-    "$brew" bundle install --file "$1" --no-upgrade
+plan_packages() {
+  manifest=$(profile_manifest "$1") || dotfiles_die "The $1 profile is unsupported on $platform."
+  printf '%s\n' "Platform: $platform"
+  printf '%s\n' "Manifest: $manifest"
+  if [ "$platform" = arch ]; then dotfiles_read_manifest "$manifest"; fi
+}
+
+apply_packages() {
+  manifest=$(profile_manifest "$1") || dotfiles_die "The $1 profile is unsupported on $platform."
+  if [ "$platform" = macos ]; then dotfiles_install_brewfile "$manifest"; else dotfiles_install_arch_manifest "$manifest"; fi
+}
+
+plan_profile() {
+  profile_platform
+  case "$1" in
+    cli) plan_packages cli ;;
+    desktop)
+      plan_packages desktop
+      if [ "$platform" = arch ]; then
+        aur_manifest="$repo_root/packages/arch/aur-desktop.txt"
+        dotfiles_validate_manifest "$aur_manifest"
+        printf '%s\n' "AUR packages:"
+        dotfiles_read_manifest "$aur_manifest"
+      fi
+      ;;
+    docker) plan_packages docker ;;
+    pokemonsay) plan_packages pokemonsay; pokemonsay_plan; pokemonsay_preflight ;;
+    rust) plan_packages rust; printf '%s\n' "Installs the stable Rust toolchain and rustfmt, clippy, rust-src." ;;
+    shell) printf '%s\n' "Sets Fish as the login shell after separate confirmations." ;;
+    *) usage >&2; exit 2 ;;
+  esac
 }
 
 apply_profile() {
-  profile=$1
-  case "$profile" in
-    cli)
-      if [ "$platform" = macos ]; then
-        install_brewfile "$repo_root/Brewfile.cli"
-      else
-        install_arch_list "$repo_root/packages/arch/cli.txt"
-      fi
-      ;;
+  dotfiles_require_tty
+  plan_profile "$1"
+  dotfiles_confirm "Apply profile: $1"
+  case "$1" in
+    cli) apply_packages cli ;;
     desktop)
-      if [ "$platform" = macos ]; then
-        install_brewfile "$repo_root/Brewfile.desktop"
-      else
-        install_arch_list "$repo_root/packages/arch/desktop.txt"
-        install_arch_list "$repo_root/packages/arch/aur-desktop.txt"
+      apply_packages desktop
+      if [ "$platform" = arch ]; then
+        aur_manifest="$repo_root/packages/arch/aur-desktop.txt"
+        dotfiles_confirm "Install the displayed AUR packages."
+        dotfiles_install_arch_manifest "$aur_manifest"
       fi
       ;;
     docker)
+      apply_packages docker
       if [ "$platform" = macos ]; then
-        install_brewfile "$repo_root/Brewfile.docker"
         printf '%s\n' "Start Docker Desktop and complete its first-run setup before using Docker."
       else
-        install_arch_list "$repo_root/packages/arch/docker.txt"
         printf '%s\n' "Docker is installed but not enabled. To enable it, run: sudo systemctl enable --now docker"
         printf '%s\n' "Adding a user to the docker group grants root-equivalent access and is intentionally manual."
       fi
       ;;
     pokemonsay)
-      source_url=https://github.com/HRKings/pokemonsay-newgenerations.git
-      source_commit=f8a24a05dd3330fac2a75fdbaf19f72948cedfb3
-      data_dir=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/pokemonsay
-      marker="$data_dir/.dotfiles-pokemonsay"
-      if [ -e "$data_dir" ] && { [ ! -d "$data_dir" ] || [ -L "$data_dir" ]; }; then
-        printf '%s\n' "Refusing to replace invalid pokemonsay data path: $data_dir" >&2
-        exit 1
-      fi
-      if [ -e "$data_dir" ] && [ ! -f "$marker" ]; then
-        printf '%s\n' "Refusing to replace unmanaged pokemonsay data: $data_dir" >&2
-        exit 1
-      fi
-      if [ -e "$data_dir" ] && ! git -C "$data_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        printf '%s\n' "Refusing to replace invalid pokemonsay data: $data_dir" >&2
-        exit 1
-      fi
-      if [ -e "$data_dir" ] && ! git -C "$data_dir" remote get-url origin | grep -Fx "$source_url" >/dev/null; then
-        printf '%s\n' "Refusing to replace pokemonsay data from an unexpected source: $data_dir" >&2
-        exit 1
-      fi
-      if [ -e "$data_dir" ] && ! git -C "$data_dir" diff --quiet; then
-        printf '%s\n' "Refusing to replace modified pokemonsay data: $data_dir" >&2
-        exit 1
-      fi
-      if [ -e "$data_dir" ] && ! git -C "$data_dir" diff --cached --quiet; then
-        printf '%s\n' "Refusing to replace modified pokemonsay data: $data_dir" >&2
-        exit 1
-      fi
-      if [ -e "$data_dir" ]; then
-        unmanaged_files=$(git -C "$data_dir" status --porcelain --untracked-files=all | grep -v -E '^\?\? (pokemonsay|\.dotfiles-pokemonsay)$' || true)
-        if [ -n "$unmanaged_files" ]; then
-          printf '%s\n' "Refusing to replace modified pokemonsay data: $data_dir" >&2
-          exit 1
-        fi
-      fi
-      bin_dir=${XDG_BIN_HOME:-$HOME/.local/bin}
-      launcher="$bin_dir/pokemonsay"
-      if [ -e "$launcher" ] && [ ! -L "$launcher" ]; then
-        printf '%s\n' "Refusing to replace non-symlink launcher: $launcher" >&2
-        exit 1
-      fi
-      if [ -L "$launcher" ] && [ "$(readlink "$launcher")" != "$data_dir/pokemonsay" ]; then
-        printf '%s\n' "Refusing to replace unmanaged pokemonsay launcher: $launcher" >&2
-        exit 1
-      fi
-      if [ "$platform" = macos ]; then
-        install_brewfile "$repo_root/Brewfile.pokemonsay"
-      else
-        install_arch_list "$repo_root/packages/arch/pokemonsay.txt"
-      fi
-      command -v git >/dev/null 2>&1 || { printf '%s\n' "pokemonsay requires git." >&2; exit 1; }
-      temporary_data_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-pokemonsay.XXXXXX")
-      trap 'rm -rf "$temporary_data_dir"' EXIT HUP INT TERM
-      git clone --no-checkout "$source_url" "$temporary_data_dir"
-      git -C "$temporary_data_dir" checkout --detach "$source_commit"
-      test "$(git -C "$temporary_data_dir" rev-parse HEAD)" = "$source_commit" || { printf '%s\n' "pokemonsay source did not resolve to the required commit." >&2; exit 1; }
-      test -d "$temporary_data_dir/pokemons" || { printf '%s\n' "pokemonsay source payload is incomplete." >&2; exit 1; }
-      test -x "$repo_root/script/pokemonsay" || { printf '%s\n' "Managed pokemonsay wrapper is unavailable." >&2; exit 1; }
-      : > "$temporary_data_dir/.dotfiles-pokemonsay"
-      cp "$repo_root/script/pokemonsay" "$temporary_data_dir/pokemonsay"
-      chmod 755 "$temporary_data_dir/pokemonsay"
-      mkdir -p "$(dirname "$data_dir")" "$bin_dir"
-      rm -rf "$data_dir"
-      mv "$temporary_data_dir" "$data_dir"
-      trap - EXIT HUP INT TERM
-      ln -sfn "$data_dir/pokemonsay" "$launcher"
-      printf '%s\n' "pokemonsay is available at $launcher. Add $bin_dir to PATH before using it."
+      apply_packages pokemonsay
+      pokemonsay_apply
       ;;
     rust)
-      if [ "$platform" != arch ]; then
-        printf '%s\n' "The rust profile is supported only on Arch Linux." >&2
-        exit 1
-      fi
-      install_arch_list "$repo_root/packages/arch/rust.txt"
+      apply_packages rust
+      dotfiles_require_command rustup
       rustup default stable
       rustup component add rustfmt clippy rust-src
       ;;
     shell)
-      if [ ! -t 0 ] || [ ! -t 1 ]; then
-        printf '%s\n' "The shell profile requires an interactive terminal." >&2
-        exit 1
-      fi
-      fish_bin=$(command -v fish || true)
-      [ -n "$fish_bin" ] || { printf '%s\n' "Fish is not installed. Run script/bootstrap --apply first." >&2; exit 1; }
+      fish_bin=$(command -v fish) || dotfiles_die "Fish is not installed. Run script/bootstrap apply first."
       if ! grep -Fx "$fish_bin" /etc/shells >/dev/null 2>&1; then
-        printf '%s' "Add $fish_bin to /etc/shells? [y/N] "
-        read -r answer
-        case "$answer" in
-          y|Y|yes|YES) printf '%s\n' "$fish_bin" | sudo tee -a /etc/shells >/dev/null ;;
-          *) printf '%s\n' "Fish was not added to /etc/shells."; exit 1 ;;
-        esac
+        dotfiles_confirm "Add $fish_bin to /etc/shells."
+        printf '%s\n' "$fish_bin" | sudo tee -a /etc/shells >/dev/null
       fi
-      printf '%s' "Change your login shell to $fish_bin? [y/N] "
-      read -r answer
-      case "$answer" in
-        y|Y|yes|YES) chsh -s "$fish_bin" ;;
-        *) printf '%s\n' "Login shell unchanged." ;;
-      esac
+      dotfiles_confirm "Change your login shell to $fish_bin."
+      chsh -s "$fish_bin"
       ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -183,16 +113,15 @@ apply_profile() {
 
 case "${1:-}" in
   list)
-    printf '%s\n' "cli      Cross-platform command-line tools"
-    printf '%s\n' "desktop  Graphical applications"
-    printf '%s\n' "docker   Docker tooling"
-    printf '%s\n' "pokemonsay  Install the optional Pokémon quote renderer"
-    printf '%s\n' "rust     Arch Linux only: paru rustup and stable toolchain"
-    printf '%s\n' "shell    Explicitly set Fish as the login shell"
+    [ "$#" -eq 1 ] || { usage >&2; exit 2; }
+    printf '%s\n' "cli         Cross-platform command-line tools"
+    printf '%s\n' "desktop     Graphical applications; Arch includes a separately confirmed AUR manifest"
+    printf '%s\n' "docker      Docker tooling without daemon or group changes"
+    printf '%s\n' "pokemonsay Optional pinned upstream payload and cowsay dependency"
+    printf '%s\n' "rust        Arch Linux only: rustup stable toolchain"
+    printf '%s\n' "shell       Explicitly sets Fish as the login shell"
     ;;
-  apply)
-    [ "$#" -eq 2 ] || { usage >&2; exit 2; }
-    apply_profile "$2"
-    ;;
+  plan) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; plan_profile "$2" ;;
+  apply) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; apply_profile "$2" ;;
   *) usage >&2; exit 2 ;;
 esac

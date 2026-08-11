@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -eu
+
+usage() {
+  printf '%s\n' "Usage: maintenance/clean-rust-artifacts plan|apply --root DIRECTORY"
+}
+
+mode=${1:-}
+shift || true
+root=
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --root) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; root=$2; shift 2 ;;
+    *) usage >&2; exit 2 ;;
+  esac
+done
+case "$mode" in plan|apply) ;; *) usage >&2; exit 2 ;; esac
+case "$root" in /*) ;; *) printf '%s\n' "Root must be an absolute path." >&2; exit 2 ;; esac
+[ -d "$root" ] && [ ! -L "$root" ] || { printf '%s\n' "Root must be a physical directory." >&2; exit 1; }
+root=$(CDPATH='' cd -- "$root" && pwd -P)
+case "$root" in /|"$HOME") printf '%s\n' "Refusing unsafe root: $root" >&2; exit 1 ;; esac
+
+manifests=$(find "$root" \( -type d \( -name .git -o -name node_modules -o -name target \) -prune \) -o \( -type f -name Cargo.toml -print \))
+[ -n "$manifests" ] && printf '%s\n' "$manifests" || printf '%s\n' "No Cargo manifests found."
+[ "$mode" = plan ] && exit 0
+[ -t 0 ] && [ -t 1 ] || { printf '%s\n' "Apply requires an interactive terminal." >&2; exit 1; }
+command -v cargo >/dev/null 2>&1 || { printf '%s\n' "cargo is required." >&2; exit 1; }
+printf '%s' "Type APPLY to run cargo clean for the listed manifests: "
+IFS= read -r answer < /dev/tty || exit 1
+[ "$answer" = APPLY ] || { printf '%s\n' "Operation cancelled." >&2; exit 1; }
+status=0
+while IFS= read -r manifest; do
+  cargo clean --manifest-path "$manifest" || status=1
+done <<EOF
+$manifests
+EOF
+exit "$status"
