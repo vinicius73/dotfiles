@@ -39,14 +39,14 @@ profile_action() {
     plan:pokemonsay) profile_pokemonsay_plan ;;
     plan:rust) profile_rust_plan ;;
     plan:shell) profile_shell_plan ;;
-    plan:shell-plugins) profile_shell_plugins_plan ;;
+    plan:shell-plugins) shell_plugins_plan ;;
     apply:cli) profile_packages_apply cli ;;
     apply:desktop) profile_desktop_apply ;;
     apply:docker) profile_docker_apply ;;
     apply:pokemonsay) profile_pokemonsay_apply ;;
     apply:rust) profile_rust_apply ;;
     apply:shell) profile_shell_apply ;;
-    apply:shell-plugins) profile_shell_plugins_apply ;;
+    apply:shell-plugins) shell_plugins_install_fish; shell_plugins_install_zsh ;;
     *) usage >&2; exit 2 ;;
   esac
 }

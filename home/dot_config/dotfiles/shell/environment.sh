@@ -5,7 +5,10 @@ dotfiles_load_environment() {
     return 0
   fi
   dotfiles_validate_secrets || return 0
-  [ -e "$dotfiles_env_dir" ] || { dotfiles_load_keychain_secrets; return 0; }
+  if [ ! -e "$dotfiles_env_dir" ]; then
+    dotfiles_load_keychain_secrets
+    return 0
+  fi
   if [ ! -d "$dotfiles_env_dir" ] || [ -L "$dotfiles_env_dir" ] || ! dotfiles_env_is_secure "$dotfiles_env_dir" directory; then
     printf '%s\n' 'dotfiles: refusing insecure environment directory' >&2
     dotfiles_load_keychain_secrets

@@ -19,20 +19,17 @@ profile_packages_apply() {
 }
 
 profile_desktop_plan() {
-  profile_desktop_platform=$(dotfiles_platform)
   profile_packages_plan desktop
-  if [ "$profile_desktop_platform" = arch ]; then
+  if [ "$profile_packages_platform" = arch ]; then
     profile_desktop_aur_manifest="$DOTFILES_REPO_ROOT/packages/arch/aur-desktop.txt"
-    dotfiles_validate_manifest "$profile_desktop_aur_manifest"
     printf '%s\n' "AUR packages:"
     dotfiles_read_manifest "$profile_desktop_aur_manifest"
   fi
 }
 
 profile_desktop_apply() {
-  profile_desktop_platform=$(dotfiles_platform)
   profile_packages_apply desktop
-  if [ "$profile_desktop_platform" = arch ]; then
+  if [ "$profile_packages_platform" = arch ]; then
     profile_desktop_aur_manifest="$DOTFILES_REPO_ROOT/packages/arch/aur-desktop.txt"
     dotfiles_confirm "Install the displayed AUR packages."
     dotfiles_install_arch_manifest "$profile_desktop_aur_manifest"

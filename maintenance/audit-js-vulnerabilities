@@ -93,16 +93,15 @@ audit_project() {
   fi
 
   if [ "$mode" = audit ]; then
-    (
-      cd "$project"
-      "$manager" audit --json --audit-level="$severity"
-    )
+    set -- audit --json "--audit-level=$severity"
   else
-    (
-      cd "$project"
-      "$manager" audit fix --audit-level="$severity"
-    )
+    set -- audit fix "--audit-level=$severity"
   fi
+
+  (
+    cd "$project"
+    "$manager" "$@"
+  )
 }
 
 maintenance_run_targets "$projects" audit_project

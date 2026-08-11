@@ -86,8 +86,4 @@ fi
 
 maintenance_confirm_apply "Type APPLY to remove the listed Node artifacts: " || exit "$?"
 
-remove_target() {
-  rm -rf "$1"
-}
-
-maintenance_run_targets "$targets" remove_target
+maintenance_run_targets "$targets" rm -rf
