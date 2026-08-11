@@ -67,11 +67,13 @@ pokemonsay_apply() {
   chmod 755 "$pokemonsay_stage/dotfiles-pokemonsay"
   : > "$pokemonsay_stage/.dotfiles-pokemonsay"
   ln -s "$pokemonsay_data_dir/dotfiles-pokemonsay" "$pokemonsay_launcher_stage"
+  # Keep the existing payload until the staged payload is ready to activate.
   if [ -e "$pokemonsay_data_dir" ]; then
     pokemonsay_backup=$(mktemp -d "$pokemonsay_parent/.pokemonsay.backup.XXXXXX")
     rmdir "$pokemonsay_backup"
     mv "$pokemonsay_data_dir" "$pokemonsay_backup"
   fi
+  # Roll back the payload if either activation step fails.
   if ! mv "$pokemonsay_stage" "$pokemonsay_data_dir" || ! mv -f "$pokemonsay_launcher_stage" "$pokemonsay_launcher"; then
     [ -e "$pokemonsay_data_dir" ] && rm -rf "$pokemonsay_data_dir"
     [ -z "$pokemonsay_backup" ] || mv "$pokemonsay_backup" "$pokemonsay_data_dir" || true

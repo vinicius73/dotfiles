@@ -72,6 +72,12 @@ else
   result skip pokemonsay.profile not-installed
 fi
 
-shell_plugins_verify
+shell_plugins_results=$(shell_plugins_verify)
+while IFS=' ' read -r check_status check_name check_detail; do
+  [ -n "$check_status" ] || continue
+  result "$check_status" "$check_name" "$check_detail"
+done <<EOF
+$shell_plugins_results
+EOF
 
 exit "$status"

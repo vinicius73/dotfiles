@@ -3,122 +3,64 @@
 set -eu
 
 script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
-repo_root=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
-DOTFILES_REPO_ROOT=$repo_root
+DOTFILES_REPO_ROOT=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
 export DOTFILES_REPO_ROOT
-. "$repo_root/script/lib/core.sh"
-. "$repo_root/script/lib/platform.sh"
-. "$repo_root/script/lib/xdg.sh"
-. "$repo_root/script/lib/manifests.sh"
-. "$repo_root/script/lib/packages.sh"
-. "$repo_root/script/lib/pokemonsay.sh"
-. "$repo_root/script/lib/shell-plugins.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/core.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/platform.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/xdg.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/manifests.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/packages.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/pokemonsay.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/shell-plugins.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/packages.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/development.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/shell.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/shell-plugins.sh"
 
 usage() {
   printf '%s\n' "Usage: script/profile list | plan <cli|desktop|docker|pokemonsay|rust|shell|shell-plugins> | apply <cli|desktop|docker|pokemonsay|rust|shell|shell-plugins>"
 }
 
-profile_platform() {
-  platform=$(dotfiles_platform)
+list_profiles() {
+  printf '%s\n' "cli         Cross-platform command-line tools"
+  printf '%s\n' "desktop     Graphical applications; Arch includes a separately confirmed AUR manifest"
+  printf '%s\n' "docker      Docker tooling without daemon or group changes"
+  printf '%s\n' "pokemonsay Optional pinned upstream payload and cowsay dependency"
+  printf '%s\n' "rust        Arch Linux only: rustup stable toolchain"
+  printf '%s\n' "shell       Explicitly sets Fish as the login shell"
+  printf '%s\n' "shell-plugins Installs pinned Fish and Zsh plugins after confirmation"
 }
 
-profile_manifest() {
-  dotfiles_manifest_path "$1" "$platform"
-}
-
-plan_packages() {
-  manifest=$(profile_manifest "$1") || dotfiles_die "The $1 profile is unsupported on $platform."
-  printf '%s\n' "Platform: $platform"
-  printf '%s\n' "Manifest: $manifest"
-  if [ "$platform" = arch ]; then dotfiles_read_manifest "$manifest"; fi
-}
-
-apply_packages() {
-  manifest=$(profile_manifest "$1") || dotfiles_die "The $1 profile is unsupported on $platform."
-  if [ "$platform" = macos ]; then dotfiles_install_brewfile "$manifest"; else dotfiles_install_arch_manifest "$manifest"; fi
-}
-
-plan_profile() {
-  profile_platform
-  case "$1" in
-    cli) plan_packages cli ;;
-    desktop)
-      plan_packages desktop
-      if [ "$platform" = arch ]; then
-        aur_manifest="$repo_root/packages/arch/aur-desktop.txt"
-        dotfiles_validate_manifest "$aur_manifest"
-        printf '%s\n' "AUR packages:"
-        dotfiles_read_manifest "$aur_manifest"
-      fi
-      ;;
-    docker) plan_packages docker ;;
-    pokemonsay) plan_packages pokemonsay; pokemonsay_plan; pokemonsay_preflight ;;
-    rust) plan_packages rust; printf '%s\n' "Installs the stable Rust toolchain and rustfmt, clippy, rust-src." ;;
-    shell) printf '%s\n' "Sets Fish as the login shell after separate confirmations." ;;
-    shell-plugins) shell_plugins_plan ;;
+profile_action() {
+  case "$1:$2" in
+    plan:cli) profile_packages_plan cli ;;
+    plan:desktop) profile_desktop_plan ;;
+    plan:docker) profile_packages_plan docker ;;
+    plan:pokemonsay) profile_pokemonsay_plan ;;
+    plan:rust) profile_rust_plan ;;
+    plan:shell) profile_shell_plan ;;
+    plan:shell-plugins) profile_shell_plugins_plan ;;
+    apply:cli) profile_packages_apply cli ;;
+    apply:desktop) profile_desktop_apply ;;
+    apply:docker) profile_docker_apply ;;
+    apply:pokemonsay) profile_pokemonsay_apply ;;
+    apply:rust) profile_rust_apply ;;
+    apply:shell) profile_shell_apply ;;
+    apply:shell-plugins) profile_shell_plugins_apply ;;
     *) usage >&2; exit 2 ;;
   esac
 }
 
 apply_profile() {
   dotfiles_require_tty
-  plan_profile "$1"
+  profile_action plan "$1"
   dotfiles_confirm "Apply profile: $1"
-  case "$1" in
-    cli) apply_packages cli ;;
-    desktop)
-      apply_packages desktop
-      if [ "$platform" = arch ]; then
-        aur_manifest="$repo_root/packages/arch/aur-desktop.txt"
-        dotfiles_confirm "Install the displayed AUR packages."
-        dotfiles_install_arch_manifest "$aur_manifest"
-      fi
-      ;;
-    docker)
-      apply_packages docker
-      if [ "$platform" = macos ]; then
-        printf '%s\n' "Start Docker Desktop and complete its first-run setup before using Docker."
-      else
-        printf '%s\n' "Docker is installed but not enabled. To enable it, run: sudo systemctl enable --now docker"
-        printf '%s\n' "Adding a user to the docker group grants root-equivalent access and is intentionally manual."
-      fi
-      ;;
-    pokemonsay)
-      apply_packages pokemonsay
-      pokemonsay_apply
-      ;;
-    rust)
-      apply_packages rust
-      dotfiles_require_command rustup
-      rustup default stable
-      rustup component add rustfmt clippy rust-src
-      ;;
-    shell)
-      fish_bin=$(command -v fish) || dotfiles_die "Fish is not installed. Run script/bootstrap apply first."
-      if ! grep -Fx "$fish_bin" /etc/shells >/dev/null 2>&1; then
-        dotfiles_confirm "Add $fish_bin to /etc/shells."
-        printf '%s\n' "$fish_bin" | sudo tee -a /etc/shells >/dev/null
-      fi
-      dotfiles_confirm "Change your login shell to $fish_bin."
-      chsh -s "$fish_bin"
-      ;;
-    shell-plugins) shell_plugins_install_fish; shell_plugins_install_zsh ;;
-    *) usage >&2; exit 2 ;;
-  esac
+  profile_action apply "$1"
 }
 
 case "${1:-}" in
-  list)
-    [ "$#" -eq 1 ] || { usage >&2; exit 2; }
-    printf '%s\n' "cli         Cross-platform command-line tools"
-    printf '%s\n' "desktop     Graphical applications; Arch includes a separately confirmed AUR manifest"
-    printf '%s\n' "docker      Docker tooling without daemon or group changes"
-    printf '%s\n' "pokemonsay Optional pinned upstream payload and cowsay dependency"
-    printf '%s\n' "rust        Arch Linux only: rustup stable toolchain"
-    printf '%s\n' "shell       Explicitly sets Fish as the login shell"
-    printf '%s\n' "shell-plugins Installs pinned Fish and Zsh plugins after confirmation"
-    ;;
-  plan) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; plan_profile "$2" ;;
+  list) [ "$#" -eq 1 ] || { usage >&2; exit 2; }; list_profiles ;;
+  plan) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; profile_action plan "$2" ;;
   apply) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; apply_profile "$2" ;;
   *) usage >&2; exit 2 ;;
 esac

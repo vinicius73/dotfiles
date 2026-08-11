@@ -23,3 +23,13 @@ assert_contains "$output" "AUR package: zsh-antidote"
 
 output=$(DOTFILES_ARCH_RELEASE_FILE="$temporary_dir/arch-release" PATH="$temporary_dir/bin:$PATH" "$repo_root/script/profile" plan rust)
 assert_contains "$output" "packages/arch/rust.txt"
+
+for profile_module in \
+  packages.sh \
+  development.sh \
+  shell.sh \
+  shell-plugins.sh \
+  shell-plugins-fish.sh \
+  shell-plugins-zsh.sh; do
+  [ -f "$repo_root/script/lib/profiles/$profile_module" ] || fail "missing profile module: $profile_module"
+done

@@ -28,6 +28,12 @@ validate_shell_syntax() {
     script/lib/packages.sh \
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
+    script/lib/profiles/packages.sh \
+    script/lib/profiles/development.sh \
+    script/lib/profiles/shell.sh \
+    script/lib/profiles/shell-plugins.sh \
+    script/lib/profiles/shell-plugins-fish.sh \
+    script/lib/profiles/shell-plugins-zsh.sh \
     script/libexec/pokemonsay-wrapper \
     maintenance/lib/common.sh \
     maintenance/clean-node-artifacts \
@@ -60,6 +66,12 @@ validate_shellcheck() {
     script/lib/packages.sh \
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
+    script/lib/profiles/packages.sh \
+    script/lib/profiles/development.sh \
+    script/lib/profiles/shell.sh \
+    script/lib/profiles/shell-plugins.sh \
+    script/lib/profiles/shell-plugins-fish.sh \
+    script/lib/profiles/shell-plugins-zsh.sh \
     script/libexec/pokemonsay-wrapper \
     maintenance/lib/common.sh \
     maintenance/clean-node-artifacts \
