@@ -34,7 +34,7 @@ script/bootstrap apply
 The bootstrap has no non-interactive apply mode. `apply` confirms package installation before it changes packages, then confirms Chezmoi source adoption and the reviewed configuration diff separately. On Arch, `--system-upgrade` is required to perform a full system update.
 The base profile installs only Git, Chezmoi, Fish, mise, certificates, Curl, and Bash. It does not install desktop apps, Docker, Rust, or change the login shell.
 
-On Arch, `paru` installs both official-repository packages and the explicitly listed AUR desktop packages. Review AUR PKGBUILDs and source changes at each prompt before accepting them; the scripts never use `--noconfirm` or disable signature or checksum verification.
+On Arch, `paru` installs both official-repository packages and the explicitly listed AUR desktop packages. Review AUR PKGBUILDs and source changes at each prompt before accepting them; `script/bootstrap` and `script/profile` never use `--noconfirm` or disable signature or checksum verification.
 
 ## Profiles
 
@@ -67,4 +67,4 @@ script/verify
 mise doctor
 ```
 
-See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), [maintenance/README.md](maintenance/README.md), and [docs/migration.md](docs/migration.md) for operational details.
+See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), and [maintenance/README.md](maintenance/README.md) for operational details.

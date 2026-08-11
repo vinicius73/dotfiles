@@ -14,7 +14,7 @@ jobs:
       - name: Validate shell scripts
         run: |
           sh -n script/bootstrap script/profile script/verify script/lib/dotfiles.sh script/lib/pokemonsay.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities
-          bash -n home/dot_bashrc scripts/*.sh
+          bash -n home/dot_bashrc
           shellcheck -s sh script/bootstrap script/profile script/verify script/lib/dotfiles.sh script/lib/pokemonsay.sh script/libexec/pokemonsay-wrapper maintenance/clean-node-artifacts maintenance/clean-go-artifacts maintenance/clean-rust-artifacts maintenance/audit-js-vulnerabilities
           fish --no-execute home/dot_config/fish/config.fish home/dot_config/fish/conf.d/git-extras.fish home/dot_config/fish/functions/dotfiles_greeting.fish
       - name: Run shell tests

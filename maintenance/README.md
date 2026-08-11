@@ -1,6 +1,6 @@
 # Maintenance
 
-`maintenance/` contains the supported project-maintenance commands. The older `scripts/` directory is preserved as legacy and is not changed by this workflow.
+`maintenance/` contains the supported project-maintenance commands.
 
 Every supported cleanup command requires an explicit `plan` or `apply` verb and an absolute `--root` path. `plan` does not modify files. `apply` requires an interactive terminal and the exact confirmation `APPLY`.
 
@@ -11,5 +11,7 @@ maintenance/clean-go-artifacts plan --root "$HOME/projects"
 maintenance/clean-rust-artifacts plan --root "$HOME/projects"
 maintenance/audit-js-vulnerabilities audit --root "$HOME/projects"
 ```
+
+`maintenance/clean-node-artifacts` removes `node_modules`; pass `--include-serverless` to include `.serverless` directories.
 
 `audit-js-vulnerabilities fix` is explicitly mutating and requires the same interactive confirmation as cleanup commands.
