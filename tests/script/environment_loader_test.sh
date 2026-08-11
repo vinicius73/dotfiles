@@ -64,7 +64,7 @@ output=$(HOME="$home" USER=tester PATH="$temporary_dir/bin:$PATH" fish --no-conf
 
 printf '%s\n' 'ATOMIC_VALUE=should-not-export' 'UNDECLARED_VALUE=value' > "$env_dir/invalid.env"
 chmod 600 "$env_dir/invalid.env"
-output=$(HOME="$home" USER=tester PATH="$temporary_dir/bin:$PATH" fish --no-config -c "$fish_load_environment; printf '%s' \${ATOMIC_VALUE:-missing}" 2>&1)
+output=$(HOME="$home" USER=tester PATH="$temporary_dir/bin:$PATH" fish --no-config -c "$fish_load_environment; if set -q ATOMIC_VALUE; printf '%s' \$ATOMIC_VALUE; else; printf missing; end" 2>&1)
 assert_contains "$output" 'refusing invalid environment file: invalid.env'
 case "$output" in *missing) ;; *) fail "Fish partially loaded an invalid environment file" ;; esac
 rm "$env_dir/invalid.env"

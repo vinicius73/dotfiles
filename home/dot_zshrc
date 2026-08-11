@@ -1,3 +1,4 @@
+# Interactive-only: the environment loader can export declared secrets.
 if [[ ! -o interactive ]]; then
   return
 fi
@@ -20,6 +21,7 @@ fi
 
 export ANTIDOTE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}/antidote"
 zsh_plugins_static="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/zsh/plugins.zsh"
+# Startup only sources the generated loader; plugin installation is explicit.
 if [[ -r "$zsh_plugins_static" ]]; then
   autoload -Uz compaudit
   insecure_completion_directories=(${(f)"$(compaudit 2>/dev/null)"})

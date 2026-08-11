@@ -4,7 +4,8 @@ RUN sed -i 's/^#DisableSandbox/DisableSandbox/' /etc/pacman.conf \
  && pacman -Syu --noconfirm --needed \
     bash \
     chezmoi \
-    fish \
+    diffutils \
+     fish \
     git \
     mise \
     ruby \

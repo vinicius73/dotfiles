@@ -1,3 +1,4 @@
+# Interactive-only: the environment loader can export declared secrets.
 if [[ $- != *i* ]]; then
   return
 fi

@@ -46,7 +46,8 @@ validate_shell_syntax() {
     home/dot_config/dotfiles/shell/declarations.sh \
     home/dot_config/dotfiles/shell/environment.sh \
     home/dot_config/dotfiles/shell/keychain.sh \
-    home/dot_config/dotfiles/shell/configure.sh
+    home/dot_config/dotfiles/shell/configure.sh \
+    tests/script/shell_startup_contract_test.sh
   bash -n home/dot_bashrc
   zsh -n home/dot_zshrc
   fish --no-execute \
@@ -88,7 +89,8 @@ validate_shellcheck() {
     maintenance/clean-rust-artifacts \
     maintenance/audit-js-vulnerabilities \
     docker/arch-validation/validate.sh \
-    home/dot_config/dotfiles/shell/env.sh
+    home/dot_config/dotfiles/shell/env.sh \
+    tests/script/shell_startup_contract_test.sh
 }
 
 validate_brewfiles() {

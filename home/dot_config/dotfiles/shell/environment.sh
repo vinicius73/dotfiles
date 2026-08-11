@@ -19,6 +19,7 @@ dotfiles_load_environment() {
       continue
     fi
 
+    # Validate the complete file before exporting any of its values.
     dotfiles_env_valid=1
     while IFS= read -r dotfiles_env_line || [ -n "$dotfiles_env_line" ]; do
       case "$dotfiles_env_line" in ''|'#'*) continue ;; esac

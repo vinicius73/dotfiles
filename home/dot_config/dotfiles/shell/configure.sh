@@ -17,6 +17,7 @@ dotfiles_configure_shell() {
   done
   PATH=$dotfiles_path_without_volta
   if [ "$(uname -s)" = Darwin ]; then
+    # Homebrew mysql-client is macOS-only and must not affect other platforms.
     for dotfiles_mysql_bin in /opt/homebrew/opt/mysql-client/bin /usr/local/opt/mysql-client/bin; do
       [ -d "$dotfiles_mysql_bin" ] || continue
       case ":$PATH:" in

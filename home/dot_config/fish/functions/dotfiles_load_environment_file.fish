@@ -4,6 +4,7 @@ function dotfiles_load_environment_file --argument-names secrets_file env_file
     return 0
   end
 
+  # Validate the complete file before exporting any of its values.
   set -l valid 1
   while read -l env_line; or test -n "$env_line"
     if test -z "$env_line"; or string match -qr '^#' -- "$env_line"
