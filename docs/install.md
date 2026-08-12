@@ -24,6 +24,10 @@ Chezmoi manages the portable configuration under `home/`. `script/bootstrap plan
 
 The bootstrap only applies configuration from an interactive terminal. It does not offer a non-interactive apply mode because it intentionally does not overwrite home-directory files without a reviewed diff and explicit confirmation.
 
+## Private macOS configuration
+
+After the public bootstrap succeeds, follow [private-macos.md](private-macos.md) to apply work-specific macOS configuration from `private/macos/`.
+
 ## Personal values
 
 The repository does not manage personal Git identity or secret tokens. Copy the installed Git identity example and edit it locally:

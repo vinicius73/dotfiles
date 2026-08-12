@@ -60,6 +60,10 @@ mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rus
 
 Copy `~/.config/git/identity.local.example` to `~/.config/git/identity.local`, edit it with your identity, and do not commit the result. Existing personal configuration should be reviewed in `chezmoi diff` before it is applied.
 
+### Private macOS configuration
+
+Work-only OpenCode, Claude Code, Cursor, Zed, and related configuration lives in the ignored local `private/macos/` checkout. Apply public configuration first, then follow [docs/private-macos.md](docs/private-macos.md).
+
 ## Verification
 
 ```sh
@@ -107,4 +111,4 @@ script/validate-docker
 
 The repository is mounted read-only and the container is removed after validation.
 
-See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), and [maintenance/README.md](maintenance/README.md) for operational details.
+See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), [docs/private-macos.md](docs/private-macos.md), and [maintenance/README.md](maintenance/README.md) for operational details.

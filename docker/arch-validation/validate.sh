@@ -21,11 +21,13 @@ validate_shell_syntax() {
     script/profile \
     script/verify \
     script/validate-docker \
+    script/private-macos \
     script/lib/core.sh \
     script/lib/platform.sh \
     script/lib/xdg.sh \
     script/lib/manifests.sh \
     script/lib/packages.sh \
+    script/lib/private-macos.sh \
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
     script/lib/profiles/packages.sh \
@@ -69,11 +71,13 @@ validate_shellcheck() {
     script/profile \
     script/verify \
     script/validate-docker \
+    script/private-macos \
     script/lib/core.sh \
     script/lib/platform.sh \
     script/lib/xdg.sh \
     script/lib/manifests.sh \
     script/lib/packages.sh \
+    script/lib/private-macos.sh \
     script/lib/pokemonsay.sh \
     script/lib/shell-plugins.sh \
     script/lib/profiles/packages.sh \
