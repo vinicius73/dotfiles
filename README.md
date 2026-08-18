@@ -7,36 +7,122 @@ Cross-platform personal environment for macOS (Apple Silicon and Intel) and Arch
 - macOS `arm64` and `x86_64`
 - Arch Linux
 
-## Before the first install
+## Quick start
 
-### macOS
+Use this path when the platform prerequisites are already installed:
 
-Install Xcode Command Line Tools and Homebrew in its default prefix. The bootstrap intentionally does not install Homebrew.
+```sh
+git clone https://github.com/vinicius73/dotfiles.git
+cd dotfiles
+script/bootstrap plan
+script/bootstrap apply
+script/verify
+```
 
-### Arch Linux
+`apply` is interactive: review and confirm the package changes, Chezmoi source, and configuration diff at each prompt.
 
-Use a fully updated Arch installation with a working `sudo`, `pacman`, and network connection. Install `paru` manually from the AUR after reviewing its PKGBUILD before running this repository's bootstrap.
+To install optional tooling afterward:
 
-## Install
+```sh
+script/profile list
+script/profile plan cli
+script/profile apply cli
+```
 
-Clone this repository, then run:
+## Complete installation
+
+### 1. Prepare the system
+
+#### macOS
+
+1. Install the Xcode Command Line Tools:
+
+   ```sh
+   xcode-select --install
+   ```
+
+2. Install Homebrew in its default prefix.
+3. Open a new terminal and confirm that Homebrew is available:
+
+   ```sh
+   brew --version
+   ```
+
+The bootstrap finds Homebrew through `PATH`, `/opt/homebrew/bin/brew`, or `/usr/local/bin/brew`. It never runs a remote Homebrew installer.
+
+#### Arch Linux
+
+1. Ensure the system is fully updated and that `sudo`, `pacman`, and network access work.
+2. Install `paru` manually from the AUR, after reviewing its PKGBUILD and source files.
+3. Confirm that `paru` is available:
+
+   ```sh
+   paru --version
+   ```
+
+`paru` installs both official-repository and explicitly selected AUR packages. Review all PKGBUILDs and source changes before accepting each prompt.
+
+### 2. Clone the repository
+
+```sh
+git clone https://github.com/vinicius73/dotfiles.git
+cd dotfiles
+```
+
+### 3. Review the base setup plan
 
 ```sh
 script/bootstrap plan
 ```
 
-To install the base dependencies from an interactive terminal:
+The plan reports the detected platform, package manifest, current Chezmoi source, proposed source, and subsequent mise actions. Resolve missing prerequisites before continuing.
+
+### 4. Apply the base setup
 
 ```sh
 script/bootstrap apply
 ```
 
-The bootstrap has no non-interactive apply mode. `apply` confirms package installation before it changes packages, then confirms Chezmoi source adoption and the reviewed configuration diff separately. On Arch, `--system-upgrade` is required to perform a full system update.
-The base profile installs only Git, Chezmoi, Fish, mise, certificates, Curl, and Bash. It does not install desktop apps, Docker, Rust, or change the login shell.
+The base profile installs Git, Chezmoi, Fish, mise, certificates, Curl, and Bash. It does not install desktop applications, Docker, Rust, or change the login shell.
 
-On Arch, `paru` installs both official-repository packages and the explicitly listed AUR desktop packages. Review AUR PKGBUILDs and source changes at each prompt before accepting them; `script/bootstrap` and `script/profile` never use `--noconfirm` or disable signature or checksum verification.
+On Arch, use a full system upgrade only when explicitly intended:
 
-## Profiles
+```sh
+script/bootstrap apply --system-upgrade
+```
+
+If Chezmoi is configured with another source, adopt this checkout before applying files:
+
+```sh
+script/bootstrap adopt-source
+script/bootstrap apply
+```
+
+### 5. Verify the installation
+
+```sh
+script/verify
+mise doctor
+```
+
+### 6. Configure your local Git identity
+
+```sh
+cp ~/.config/git/identity.local.example ~/.config/git/identity.local
+```
+
+Edit `~/.config/git/identity.local` with your identity. This local file is not managed by Chezmoi and must not be committed.
+
+## Optional profiles
+
+Always inspect a profile before installing it:
+
+```sh
+script/profile plan <profile>
+script/profile apply <profile>
+```
+
+Available profiles:
 
 ```sh
 script/profile list
@@ -48,36 +134,33 @@ script/profile apply rust
 script/profile apply shell
 ```
 
-`rust` is Arch-only. `shell` is the only profile that can change the login shell, and always asks for confirmation. `pokemonsay` is optional and installs a commit-pinned upstream payload without executing its installer.
+- `cli`: curated command-line tools.
+- `desktop`: curated graphical applications.
+- `docker`: Docker tooling. Start and configure Docker Desktop manually on macOS; enable the daemon and manage Docker-group membership manually on Arch.
+- `pokemonsay`: optional, commit-pinned upstream payload; its installer is never executed.
+- `rust`: Arch-only; installs `rustup` and the stable toolchain.
+- `shell`: the only profile that changes the login shell; it always requires confirmation.
 
-The Fish greeting is disabled by default. Enable it only in a trusted local terminal with `set -gx DOTFILES_GREETING 1`; use `set -gx DOTFILES_GREETING_DISABLE 1` to suppress it for a session.
+## Shell plugins
+
+Install the pinned Fish and Zsh plugins only after reviewing their plan:
+
+```sh
+script/profile plan shell-plugins
+script/profile apply shell-plugins
+```
+
+Fish uses Fisher. Zsh uses Antidote and generates its loader at `${XDG_CACHE_HOME:-~/.cache}/dotfiles/zsh/plugins.zsh`. Shell startup never downloads or updates plugins.
 
 ## Runtime ownership
 
-mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rust is intentionally excluded: on Arch, the `rust` profile installs `rustup` through paru and configures its stable toolchain. Rust is not installed on macOS.
+mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rust is deliberately separate: the Arch-only `rust` profile installs and configures it through `rustup`. Rust is not installed on macOS.
 
 ## Local configuration
 
-Copy `~/.config/git/identity.local.example` to `~/.config/git/identity.local`, edit it with your identity, and do not commit the result. Existing personal configuration should be reviewed in `chezmoi diff` before it is applied.
+### Secrets
 
-### Global agent skills
-
-Global agent skills declared in `home/dot_agents/skills/` are restored to `~/.agents/skills/` by `script/bootstrap apply`. Local skills with different names may coexist there and are not managed or verified by Chezmoi. Edit versioned skills in this repository, review the Chezmoi diff, then restart OpenCode after applying changes.
-
-### Private macOS configuration
-
-Work-only OpenCode, Claude Code, Cursor, Zed, and related configuration lives in the ignored local `private/macos/` checkout. Apply public configuration first, then follow [docs/private-macos.md](docs/private-macos.md).
-
-## Verification
-
-```sh
-script/verify
-mise doctor
-```
-
-## Shells
-
-Bash, Fish, and Zsh load declared local secrets only in interactive sessions. Copy `~/.config/dotfiles/secrets.conf.example` to `~/.config/dotfiles/secrets.conf`, declare one variable name per line, then add literal `NAME=value` entries for those exact names to `~/.config/dotfiles/env.d/*.env`:
+Bash, Fish, and Zsh load declared local secrets only in interactive sessions. First create the local configuration:
 
 ```sh
 mkdir -p ~/.config/dotfiles/env.d
@@ -86,22 +169,37 @@ cp ~/.config/dotfiles/secrets.conf.example ~/.config/dotfiles/secrets.conf
 chmod 600 ~/.config/dotfiles/secrets.conf
 ```
 
-`secrets.conf` and `env.d` are local-only and ignored by Git. Files are ignored when their owner or permissions are unsafe. Values do not support quotes, expansion, commands, or multiline syntax, and undeclared names are rejected. On macOS, an unset declared name is looked up in Keychain using its name as the generic-password service and `$USER` as its account. No personal secret names or values are versioned.
+Then declare one variable name per line in `~/.config/dotfiles/secrets.conf` and add a literal `NAME=value` entry for each declared name in `~/.config/dotfiles/env.d/*.env`.
+
+These files are Git-ignored. Unsafe ownership or permissions prevent files from being loaded. Values do not support quotes, expansion, commands, or multiline syntax; undeclared names are rejected. On macOS, an unset declared name is looked up in Keychain using its name as the generic-password service and `$USER` as its account.
 
 `EDITOR=micro`, `VISUAL`, Volta PATH removal, and mise activation are global shell behavior. Homebrew `mysql-client` PATH integration is macOS-only.
 
-Install the pinned Fish and Zsh plugins explicitly after reviewing the plan:
+### Fish greeting
 
-```sh
-script/profile plan shell-plugins
-script/profile apply shell-plugins
+The Fish greeting is disabled by default. Enable it only in a trusted local terminal:
+
+```fish
+set -gx DOTFILES_GREETING 1
 ```
 
-Fish uses Fisher; Zsh uses Antidote and writes its generated loader to `${XDG_CACHE_HOME:-~/.cache}/dotfiles/zsh/plugins.zsh`. Startup never downloads or updates plugins.
+Suppress it for a session with:
+
+```fish
+set -gx DOTFILES_GREETING_DISABLE 1
+```
+
+### Global agent skills
+
+Global skills declared in `home/dot_agents/skills/` are restored to `~/.agents/skills/` by `script/bootstrap apply`. Local skills with different names may coexist but are not managed or verified by Chezmoi. Edit versioned skills in this repository, review the Chezmoi diff, apply the configuration, then restart OpenCode.
+
+### Private macOS configuration
+
+Work-only OpenCode, Claude Code, Cursor, Zed, and related configuration lives in the ignored local `private/macos/` checkout. Apply the public configuration first, then follow [docs/private-macos.md](docs/private-macos.md).
 
 ## Validation
 
-Run the local shell validation suite with:
+Run the local shell validation suite:
 
 ```sh
 sh tests/run.sh
@@ -115,4 +213,4 @@ script/validate-docker
 
 The repository is mounted read-only and the container is removed after validation.
 
-See [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), [docs/private-macos.md](docs/private-macos.md), and [maintenance/README.md](maintenance/README.md) for operational details.
+For operational details, see [docs/install.md](docs/install.md), [docs/profiles.md](docs/profiles.md), [docs/private-macos.md](docs/private-macos.md), and [maintenance/README.md](maintenance/README.md).
