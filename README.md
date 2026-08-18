@@ -77,7 +77,11 @@ script/bootstrap plan
 
 The plan reports the detected platform, package manifest, current Chezmoi source, proposed source, and subsequent mise actions. Resolve missing prerequisites before continuing.
 
-### 4. Apply the base setup
+### 4. Preserve your Git identity
+
+Before applying the managed `~/.gitconfig`, follow [the Git identity migration guide](docs/install.md#personal-values).
+
+### 5. Apply the base setup
 
 ```sh
 script/bootstrap apply
@@ -98,20 +102,16 @@ script/bootstrap adopt-source
 script/bootstrap apply
 ```
 
-### 5. Verify the installation
+### 6. Verify the installation
 
 ```sh
 script/verify
 mise doctor
 ```
 
-### 6. Configure your local Git identity
+### 7. Configure conditional Git identities
 
-```sh
-cp ~/.config/git/identity.local.example ~/.config/git/identity.local
-```
-
-Edit `~/.config/git/identity.local` with your identity. This local file is not managed by Chezmoi and must not be committed.
+Follow [the Git identity migration guide](docs/install.md#personal-values) to add workspace-specific identities and opt into OpenPGP signing.
 
 ## Optional profiles
 

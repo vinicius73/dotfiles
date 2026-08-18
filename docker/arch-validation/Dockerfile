@@ -7,6 +7,7 @@ RUN sed -i 's/^#DisableSandbox/DisableSandbox/' /etc/pacman.conf \
     diffutils \
     fish \
     git \
+    git-lfs \
     mise \
     ruby \
     shellcheck \

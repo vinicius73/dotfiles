@@ -32,10 +32,45 @@ After the public bootstrap succeeds, follow [private-macos.md](private-macos.md)
 
 ## Personal values
 
-The repository does not manage personal Git identity or secret tokens. Copy the installed Git identity example and edit it locally:
+Before applying the managed `~/.gitconfig`, inspect any existing global identity:
 
 ```sh
-cp ~/.config/git/identity.local.example ~/.config/git/identity.local
+git config --global --list --show-origin
 ```
 
-The local identity file is not managed by Chezmoi and must not be committed.
+The managed file contains portable defaults and includes the unmanaged `~/.config/git/identity.local`. If it does not already exist, create the default local identity before reviewing the Chezmoi diff:
+
+```sh
+install -d -m 700 ~/.config/git
+install -m 600 home/dot_config/git/identity.local.example ~/.config/git/identity.local
+```
+
+Set your name and email in `identity.local`. This repository supports the default `~/.config/git/` location; it does not support an overridden `XDG_CONFIG_HOME` for Git identity files. The local files are not managed by Chezmoi and must not be committed.
+
+For an identity scoped to a workspace, create `~/.config/git/identities` with mode `0700`, append a conditional include to `identity.local`, and create an unmanaged fragment with mode `0600`:
+
+```sh
+install -d -m 700 ~/.config/git/identities
+install -m 600 /path/to/company.local ~/.config/git/identities/company.local
+```
+
+```ini
+[includeIf "gitdir:/absolute/path/to/workspace/"]
+    path = ~/.config/git/identities/company.local
+```
+
+The standard identity loads first, the matching fragment overrides it, and repository-local configuration overrides both. Workspace paths must be canonical and end in `/`.
+
+OpenPGP signing is opt-in. After a key is configured, verify it before adding `user.signingkey`, `commit.gpgsign`, and `tag.gpgSign` to the applicable local file:
+
+```sh
+gpg --list-secret-keys --keyid-format=long
+git commit --allow-empty -S -m "Verify signing"
+git log --show-signature -1
+```
+
+Inspect the effective configuration from a repository with:
+
+```sh
+git config --show-origin --show-scope --includes --get-regexp '^(user|commit|tag|gpg)\.'
+```

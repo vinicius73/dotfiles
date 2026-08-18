@@ -1,10 +1,3 @@
 [user]
-	name = Your Name
-	email = you@example.com
-	signingkey = YOUR_GPG_KEY_ID
-[commit]
-	gpgsign = true
-[tag]
-	gpgSign = true
-[sequence]
-	editor = code --wait
+	name = YOUR_NAME
+	email = YOUR_EMAIL

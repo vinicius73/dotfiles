@@ -4,5 +4,6 @@ chezmoi
 curl
 fish
 git
+git-lfs
 mise
 zsh
