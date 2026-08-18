@@ -60,6 +60,10 @@ mise manages Node, Corepack package managers, Go, Ruby, Java, Bun, and Deno. Rus
 
 Copy `~/.config/git/identity.local.example` to `~/.config/git/identity.local`, edit it with your identity, and do not commit the result. Existing personal configuration should be reviewed in `chezmoi diff` before it is applied.
 
+### Global agent skills
+
+Global agent skills declared in `home/dot_agents/skills/` are restored to `~/.agents/skills/` by `script/bootstrap apply`. Local skills with different names may coexist there and are not managed or verified by Chezmoi. Edit versioned skills in this repository, review the Chezmoi diff, then restart OpenCode after applying changes.
+
 ### Private macOS configuration
 
 Work-only OpenCode, Claude Code, Cursor, Zed, and related configuration lives in the ignored local `private/macos/` checkout. Apply public configuration first, then follow [docs/private-macos.md](docs/private-macos.md).

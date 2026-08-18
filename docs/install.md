@@ -24,6 +24,8 @@ Chezmoi manages the portable configuration under `home/`. `script/bootstrap plan
 
 The bootstrap only applies configuration from an interactive terminal. It does not offer a non-interactive apply mode because it intentionally does not overwrite home-directory files without a reviewed diff and explicit confirmation.
 
+Global agent skills declared under `home/dot_agents/skills/` are restored to `~/.agents/skills/`. Local skills with different names may coexist in that directory but are not managed or verified by Chezmoi. Make changes to versioned skills in the repository source, run the bootstrap apply flow, and restart OpenCode to reload them.
+
 ## Private macOS configuration
 
 After the public bootstrap succeeds, follow [private-macos.md](private-macos.md) to apply work-specific macOS configuration from `private/macos/`.

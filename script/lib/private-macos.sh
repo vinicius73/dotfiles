@@ -80,6 +80,13 @@ private_macos_targets_conflict() {
   return 1
 }
 
+private_macos_target_is_agents_path() {
+  case "$1" in
+    "$HOME/.agents"|"$HOME/.agents"/*) return 0 ;;
+  esac
+  return 1
+}
+
 private_macos_validate_targets() {
   private_macos_public_source="$DOTFILES_REPO_ROOT/home"
   private_macos_public_targets=$(mktemp "${TMPDIR:-/tmp}/dotfiles-private-public.XXXXXX") || dotfiles_die "Cannot create temporary target list."
@@ -96,6 +103,9 @@ private_macos_validate_targets() {
 
   while IFS= read -r private_macos_target; do
     [ -n "$private_macos_target" ] || continue
+    if private_macos_target_is_agents_path "$private_macos_target"; then
+      dotfiles_die "Private Chezmoi configuration cannot manage agent paths: $private_macos_target"
+    fi
     while IFS= read -r private_macos_public_target; do
       if private_macos_targets_conflict "$private_macos_target" "$private_macos_public_target"; then
         dotfiles_die "Private Chezmoi target conflicts with public configuration: $private_macos_target"

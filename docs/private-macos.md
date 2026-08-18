@@ -9,7 +9,7 @@
 3. Run `script/private-macos plan`.
 4. Run `script/private-macos apply` to install optional private packages and apply private configuration.
 
-Private application refuses to run unless `chezmoi verify --source home --destination "$HOME"` succeeds. It also rejects every destination managed by the public source, so the private configuration can add work-specific settings but cannot override portable configuration.
+Private application refuses to run unless `chezmoi verify --source home --destination "$HOME"` succeeds. It also rejects every destination managed by the public source, so the private configuration can add work-specific settings but cannot override portable configuration. The private source cannot manage `~/.agents/**`; local agent skills must use a separate installer and cannot reuse names declared by `home/dot_agents/skills/`.
 
 ## Private layout
 
