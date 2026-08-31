@@ -1,0 +1,2 @@
+cursor-bin
+visual-studio-code-bin

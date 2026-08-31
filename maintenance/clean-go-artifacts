@@ -1,0 +1,73 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=maintenance/lib/common.sh
+. "$script_dir/lib/common.sh"
+
+usage() {
+  printf '%s\n' "Usage: maintenance/clean-go-artifacts plan|apply --root DIRECTORY"
+}
+
+mode=
+root=
+
+if [ "$#" -gt 0 ]; then
+  mode=$1
+  shift
+fi
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --root)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      root=$2
+      shift 2
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+case "$mode" in
+  plan|apply) ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
+root=$(maintenance_validate_root "$root") || exit "$?"
+
+list_targets() {
+  find "$root" \( -type d \( -name .git -o -name node_modules -o -name target \) -prune \) -o \( -type f -name go.mod -exec dirname {} \; \) |
+    while IFS= read -r project; do
+      target=$project/bin
+
+      if [ -d "$target" ] && [ ! -L "$target" ]; then
+        printf '%s\n' "$target"
+      fi
+    done
+}
+
+targets=$(list_targets)
+
+if [ -n "$targets" ]; then
+  printf '%s\n' "$targets"
+else
+  printf '%s\n' "No Go artifacts found."
+fi
+
+if [ "$mode" = plan ]; then
+  exit 0
+fi
+
+maintenance_confirm_apply "Type APPLY to remove the listed Go artifacts: " || exit "$?"
+
+maintenance_run_targets "$targets" rm -rf

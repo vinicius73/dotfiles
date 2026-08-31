@@ -1,0 +1,71 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=maintenance/lib/common.sh
+. "$script_dir/lib/common.sh"
+
+usage() {
+  printf '%s\n' "Usage: maintenance/clean-rust-artifacts plan|apply --root DIRECTORY"
+}
+
+mode=
+root=
+
+if [ "$#" -gt 0 ]; then
+  mode=$1
+  shift
+fi
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --root)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      root=$2
+      shift 2
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+case "$mode" in
+  plan|apply) ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
+root=$(maintenance_validate_root "$root") || exit "$?"
+
+manifests=$(find "$root" \( -type d \( -name .git -o -name node_modules -o -name target \) -prune \) -o \( -type f -name Cargo.toml -print \))
+
+if [ -n "$manifests" ]; then
+  printf '%s\n' "$manifests"
+else
+  printf '%s\n' "No Cargo manifests found."
+fi
+
+if [ "$mode" = plan ]; then
+  exit 0
+fi
+
+if ! command -v cargo >/dev/null 2>&1; then
+  printf '%s\n' "cargo is required." >&2
+  exit 1
+fi
+
+maintenance_confirm_apply "Type APPLY to run cargo clean for the listed manifests: " || exit "$?"
+
+clean_manifest() {
+  cargo clean --manifest-path "$1"
+}
+
+maintenance_run_targets "$manifests" clean_manifest

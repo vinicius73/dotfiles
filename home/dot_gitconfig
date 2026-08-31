@@ -1,0 +1,15 @@
+[alias]
+	vlog = log --graph --date-order --date=relative --pretty=format:"%C(white)%h: %Cgreen - %an - %Cred %C(cyan)%ar:%Creset%n%s%n" --color
+[pull]
+	rebase = false
+[init]
+	defaultBranch = master
+[push]
+	default = simple
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[include]
+	path = ~/.config/git/identity.local

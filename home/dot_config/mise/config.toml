@@ -1,0 +1,13 @@
+min_version = "2025.1.0"
+
+[tools]
+bun = "1"
+deno = "2"
+go = "1.26"
+java = "21"
+node = "lts"
+ruby = "3.4"
+
+[settings]
+idiomatic_version_file_enable_tools = ["go", "java", "node", "ruby"]
+idiomatic_version_file_disable_files = ["node:package.json"]

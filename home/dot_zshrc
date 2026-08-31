@@ -1,0 +1,41 @@
+# Interactive-only: the environment loader can export declared secrets.
+if [[ ! -o interactive ]]; then
+  return
+fi
+
+export ANSIBLE_NOCOWS=1
+
+if [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh" ]]; then
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh"
+  dotfiles_load_environment
+  dotfiles_configure_shell
+fi
+
+typeset -U path PATH
+path=("$HOME/.local/bin" $path)
+export PATH
+
+if (( $+commands[mise] )) && [[ -z ${MISE_SHELL:-} ]]; then
+  eval "$(mise activate zsh)"
+fi
+
+export ANTIDOTE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}/antidote"
+zsh_plugins_static="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/zsh/plugins.zsh"
+# Startup only sources the generated loader; plugin installation is explicit.
+if [[ -r "$zsh_plugins_static" ]]; then
+  autoload -Uz compaudit
+  insecure_completion_directories=(${(f)"$(compaudit 2>/dev/null)"})
+  if (( ${#insecure_completion_directories} )); then
+    print -u2 'dotfiles: refusing insecure Zsh completion directories'
+  else
+    export ZSH="$ANTIDOTE_HOME/github.com/ohmyzsh/ohmyzsh"
+    plugins=(git fzf)
+    source "$zsh_plugins_static"
+  fi
+fi
+
+if (( $+commands[eza] )); then
+  alias ll='eza -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso'
+  alias la='eza -l -g --icons --octal-permissions --no-permissions --no-user -s type --time-style long-iso -a'
+  alias lla='ll -a'
+fi

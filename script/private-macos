@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+DOTFILES_REPO_ROOT=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+export DOTFILES_REPO_ROOT
+. "$DOTFILES_REPO_ROOT/script/lib/core.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/platform.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/private-macos.sh"
+
+usage() {
+  printf '%s\n' "Usage: script/private-macos plan|apply|verify"
+}
+
+[ "$#" -eq 1 ] || { usage >&2; exit 2; }
+
+action=$1
+
+case "$action" in
+  plan) private_macos_plan ;;
+  apply) private_macos_apply ;;
+  verify) private_macos_verify ;;
+  *) usage >&2; exit 2 ;;
+esac

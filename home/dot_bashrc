@@ -1,0 +1,22 @@
+# Interactive-only: the environment loader can export declared secrets.
+if [[ $- != *i* ]]; then
+  return
+fi
+
+export ANSIBLE_NOCOWS=1
+
+if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh" ]; then
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/shell/env.sh"
+  dotfiles_load_environment
+  dotfiles_configure_shell
+fi
+
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
+export PATH
+
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash)"
+fi

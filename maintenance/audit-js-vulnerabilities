@@ -1,0 +1,107 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=maintenance/lib/common.sh
+. "$script_dir/lib/common.sh"
+
+usage() {
+  printf '%s\n' "Usage: maintenance/audit-js-vulnerabilities audit|fix --root DIRECTORY [--severity LEVEL]"
+}
+
+mode=
+root=
+severity=moderate
+
+if [ "$#" -gt 0 ]; then
+  mode=$1
+  shift
+fi
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --root)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      root=$2
+      shift 2
+      ;;
+    --severity)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      severity=$2
+      shift 2
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+case "$mode" in
+  audit|fix) ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
+case "$severity" in
+  low|moderate|high|critical) ;;
+  *)
+    printf '%s\n' "Invalid severity: $severity" >&2
+    exit 2
+    ;;
+esac
+
+root=$(maintenance_validate_root "$root") || exit "$?"
+
+projects=$(find "$root" \( -type d \( -name .git -o -name node_modules \) -prune \) -o \( -type f -name package.json -exec dirname {} \; \))
+
+if [ -n "$projects" ]; then
+  printf '%s\n' "$projects"
+else
+  printf '%s\n' "No JavaScript projects found."
+fi
+
+if [ "$mode" = fix ]; then
+  maintenance_confirm_apply "Type APPLY to run package-manager fixes in the listed projects: " Fix || exit "$?"
+fi
+
+audit_project() {
+  project=$1
+
+  if [ -f "$project/pnpm-lock.yaml" ]; then
+    manager=pnpm
+  elif [ -f "$project/bun.lockb" ] || [ -f "$project/bun.lock" ]; then
+    manager=bun
+  elif [ -f "$project/yarn.lock" ]; then
+    manager=yarn
+  else
+    manager=npm
+  fi
+
+  if ! command -v "$manager" >/dev/null 2>&1; then
+    printf '%s\n' "Skipping $project: $manager is unavailable." >&2
+    return 1
+  fi
+
+  if [ "$mode" = audit ]; then
+    set -- audit --json "--audit-level=$severity"
+  else
+    set -- audit fix "--audit-level=$severity"
+  fi
+
+  (
+    cd "$project"
+    "$manager" "$@"
+  )
+}
+
+maintenance_run_targets "$projects" audit_project

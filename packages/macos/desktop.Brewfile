@@ -1,0 +1,5 @@
+cask "bruno"
+cask "dbeaver-community"
+cask "postman"
+cask "visual-studio-code"
+cask "zed"

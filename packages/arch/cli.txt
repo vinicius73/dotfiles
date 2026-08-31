@@ -1,0 +1,10 @@
+bat
+eza
+fd
+fzf
+ghq
+git-extras
+jq
+micro
+ripgrep
+shellcheck

@@ -1,0 +1,66 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+DOTFILES_REPO_ROOT=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+export DOTFILES_REPO_ROOT
+. "$DOTFILES_REPO_ROOT/script/lib/core.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/platform.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/xdg.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/manifests.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/packages.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/pokemonsay.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/shell-plugins.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/packages.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/development.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/shell.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/profiles/shell-plugins.sh"
+
+usage() {
+  printf '%s\n' "Usage: script/profile list | plan <cli|desktop|docker|pokemonsay|rust|shell|shell-plugins> | apply <cli|desktop|docker|pokemonsay|rust|shell|shell-plugins>"
+}
+
+list_profiles() {
+  printf '%s\n' "cli         Cross-platform command-line tools"
+  printf '%s\n' "desktop     Graphical applications; Arch includes a separately confirmed AUR manifest"
+  printf '%s\n' "docker      Docker tooling without daemon or group changes"
+  printf '%s\n' "pokemonsay Optional pinned upstream payload and cowsay dependency"
+  printf '%s\n' "rust        Arch Linux only: rustup stable toolchain"
+  printf '%s\n' "shell       Explicitly sets Fish as the login shell"
+  printf '%s\n' "shell-plugins Installs pinned Fish and Zsh plugins after confirmation"
+}
+
+profile_action() {
+  case "$1:$2" in
+    plan:cli) profile_packages_plan cli ;;
+    plan:desktop) profile_desktop_plan ;;
+    plan:docker) profile_packages_plan docker ;;
+    plan:pokemonsay) profile_pokemonsay_plan ;;
+    plan:rust) profile_rust_plan ;;
+    plan:shell) profile_shell_plan ;;
+    plan:shell-plugins) shell_plugins_plan ;;
+    apply:cli) profile_packages_apply cli ;;
+    apply:desktop) profile_desktop_apply ;;
+    apply:docker) profile_docker_apply ;;
+    apply:pokemonsay) profile_pokemonsay_apply ;;
+    apply:rust) profile_rust_apply ;;
+    apply:shell) profile_shell_apply ;;
+    apply:shell-plugins) shell_plugins_install_fish; shell_plugins_install_zsh ;;
+    *) usage >&2; exit 2 ;;
+  esac
+}
+
+apply_profile() {
+  dotfiles_require_tty
+  profile_action plan "$1"
+  dotfiles_confirm "Apply profile: $1"
+  profile_action apply "$1"
+}
+
+case "${1:-}" in
+  list) [ "$#" -eq 1 ] || { usage >&2; exit 2; }; list_profiles ;;
+  plan) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; profile_action plan "$2" ;;
+  apply) [ "$#" -eq 2 ] || { usage >&2; exit 2; }; apply_profile "$2" ;;
+  *) usage >&2; exit 2 ;;
+esac

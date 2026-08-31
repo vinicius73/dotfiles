@@ -1,0 +1,83 @@
+#!/bin/sh
+
+set -eu
+
+status=0
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+DOTFILES_REPO_ROOT=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+export DOTFILES_REPO_ROOT
+. "$DOTFILES_REPO_ROOT/script/lib/core.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/platform.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/xdg.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/manifests.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/packages.sh"
+. "$DOTFILES_REPO_ROOT/script/lib/shell-plugins.sh"
+
+result() {
+  printf '%-5s %s %s\n' "$1" "$2" "$3"
+  [ "$1" != fail ] || status=1
+}
+
+check_command() {
+  if path=$(command -v "$1"); then result ok "base.command.$1" "$path"; else result fail "base.command.$1" missing; fi
+}
+
+for command in chezmoi fish mise zsh; do check_command "$command"; done
+
+if command -v chezmoi >/dev/null 2>&1; then
+  chezmoi_source=$(chezmoi source-path 2>/dev/null || true)
+  if [ -n "$chezmoi_source" ] && [ -d "$chezmoi_source" ]; then
+    if chezmoi verify; then result ok chezmoi.verify valid; else result fail chezmoi.verify invalid; fi
+  else
+    result fail chezmoi.source missing
+  fi
+fi
+
+mise_config=$(dotfiles_xdg_home XDG_CONFIG_HOME "$HOME/.config")/mise/config.toml
+if command -v mise >/dev/null 2>&1; then
+  if [ -f "$mise_config" ]; then
+    if mise config ls >/dev/null; then result ok mise.config "$mise_config"; else result fail mise.config invalid; fi
+  else
+    result fail mise.config missing
+  fi
+fi
+
+case "$(uname -s)" in
+  Darwin)
+    for command in rustup cargo rustc; do
+      if command -v "$command" >/dev/null 2>&1; then result fail "macos.rust.$command" unexpected; fi
+    done
+    ;;
+  Linux)
+    if [ -e "${DOTFILES_ARCH_RELEASE_FILE:-/etc/arch-release}" ]; then
+      if command -v rustup >/dev/null 2>&1; then
+        if command -v pacman >/dev/null 2>&1; then
+          if pacman -Qo "$(command -v rustup)" >/dev/null; then result ok arch.rust.owner rustup; else result fail arch.rust.owner invalid; fi
+        else
+          result fail arch.pacman missing
+        fi
+      else
+        result skip arch.rust.owner rustup-not-installed
+      fi
+    fi
+    ;;
+esac
+
+pokemonsay_data=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/pokemonsay
+pokemonsay_bin=${XDG_BIN_HOME:-$HOME/.local/bin}/pokemonsay
+if [ -e "$pokemonsay_data" ] || [ -e "$pokemonsay_bin" ]; then
+  if [ -f "$pokemonsay_data/.dotfiles-pokemonsay" ] && [ -x "$pokemonsay_data/dotfiles-pokemonsay" ] && [ -L "$pokemonsay_bin" ] && [ "$(readlink "$pokemonsay_bin")" = "$pokemonsay_data/dotfiles-pokemonsay" ]; then result ok pokemonsay.profile valid; else result fail pokemonsay.profile invalid; fi
+else
+  result skip pokemonsay.profile not-installed
+fi
+
+shell_plugins_results=$(shell_plugins_verify)
+while IFS=' ' read -r check_status check_name check_detail; do
+  [ -n "$check_status" ] || continue
+  result "$check_status" "$check_name" "$check_detail"
+done <<EOF
+$shell_plugins_results
+EOF
+
+exit "$status"

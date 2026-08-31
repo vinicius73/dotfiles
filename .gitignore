@@ -1,4 +1,3 @@
-pokemonsay/*
 nav/*
 sublime/Packages/User/*.cache
 sublime/Packages/User/*.last-run
@@ -6,3 +5,9 @@ sublime/Packages/User/*.merged-ca-bundle
 sublime/Packages/User/*.user-ca-bundle
 google-cloud-sdk/
 bash/envs.bash
+home/dot_config/git/identity.local
+home/dot_config/git/identities/
+home/dot_config/dotfiles/secrets.conf
+home/dot_config/dotfiles/env.d/
+/private/*
+!/private/.gitignore

@@ -1,0 +1,141 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+repo_root=$(CDPATH='' cd -- "$script_dir/.." && pwd -P)
+DOTFILES_REPO_ROOT=$repo_root
+export DOTFILES_REPO_ROOT
+. "$repo_root/script/lib/core.sh"
+. "$repo_root/script/lib/platform.sh"
+. "$repo_root/script/lib/manifests.sh"
+. "$repo_root/script/lib/packages.sh"
+
+usage() {
+  printf '%s\n' "Usage: script/bootstrap plan | apply [--system-upgrade] | adopt-source"
+}
+
+source_dir="$repo_root/home"
+
+validate_repository() {
+  [ -d "$source_dir" ] && [ ! -L "$source_dir" ] || dotfiles_die "Invalid Chezmoi source directory: $source_dir"
+  git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1 || dotfiles_die "Dotfiles repository is not a Git worktree: $repo_root"
+  git -C "$repo_root" ls-files --error-unmatch -- home/dot_bashrc >/dev/null 2>&1 || dotfiles_die "Chezmoi source is incomplete: $source_dir"
+}
+
+base_manifest() {
+  dotfiles_manifest_path base "$platform" || dotfiles_die "Base profile is unsupported on $platform."
+}
+
+configured_chezmoi_source() {
+  command -v chezmoi >/dev/null 2>&1 || return 0
+  chezmoi_source=$(chezmoi source-path 2>/dev/null || true)
+  if [ -d "$chezmoi_source" ]; then
+    printf '%s\n' "$chezmoi_source"
+  fi
+  return 0
+}
+
+plan() {
+  validate_repository
+  platform=$(dotfiles_platform)
+  manifest=$(base_manifest)
+  case "$platform" in
+    macos)
+      if brew_path=$(dotfiles_brew); then
+        printf '%s\n' "Homebrew: $brew_path"
+      else
+        printf '%s\n' "Homebrew: missing (required by apply)"
+      fi
+      printf '%s\n' "Platform: macos ($(uname -m))"
+      printf '%s\n' "Base Brewfile: $manifest"
+      ;;
+    arch)
+      dotfiles_require_command paru
+      dotfiles_validate_manifest "$manifest"
+      printf '%s\n' "Platform: arch ($(uname -m))"
+      printf '%s\n' "Base packages:"
+      dotfiles_read_manifest "$manifest"
+      ;;
+  esac
+  current_source=$(configured_chezmoi_source)
+  if [ -n "$current_source" ]; then
+    printf '%s\n' "Configured Chezmoi source: $current_source"
+  else
+    printf '%s\n' "Configured Chezmoi source: none"
+  fi
+  printf '%s\n' "Proposed Chezmoi source: $source_dir"
+  printf '%s\n' "mise install and mise reshim run after Chezmoi apply."
+}
+
+require_chezmoi_source() {
+  current_source=$(configured_chezmoi_source)
+  [ -z "$current_source" ] && return 0
+  [ "$(CDPATH='' cd -- "$current_source" 2>/dev/null && pwd -P)" = "$source_dir" ] || dotfiles_die "Chezmoi is configured for another source: $current_source. Run script/bootstrap adopt-source to change it."
+}
+
+adopt_source() {
+  validate_repository
+  dotfiles_require_tty
+  current_source=$(configured_chezmoi_source)
+  [ -n "$current_source" ] || dotfiles_die "Chezmoi has no configured source to adopt. Run script/bootstrap apply instead."
+  [ "$(CDPATH='' cd -- "$current_source" 2>/dev/null && pwd -P)" != "$source_dir" ] || { printf '%s\n' "Chezmoi already uses this source."; exit 0; }
+  dotfiles_confirm "Change Chezmoi source from $current_source to $source_dir. This does not apply home-directory files."
+  chezmoi init --source "$source_dir"
+  printf '%s\n' "Chezmoi source adopted: $source_dir"
+}
+
+install_base_packages() {
+  case "$platform" in
+    macos) dotfiles_install_brewfile "$manifest" ;;
+    arch)
+      if [ "$system_upgrade" = true ]; then
+        set --
+        while IFS= read -r package; do
+          [ -n "$package" ] && set -- "$@" "$package"
+        done < "$manifest"
+        paru -Syu --needed "$@"
+      else
+        dotfiles_install_arch_manifest "$manifest"
+      fi
+      ;;
+  esac
+}
+
+apply() {
+  dotfiles_require_tty
+  plan
+  if [ "$system_upgrade" = true ]; then
+    dotfiles_confirm "Apply the base package set and a full Arch system upgrade."
+  else
+    dotfiles_confirm "Apply the base package set."
+  fi
+  install_base_packages
+  for command in chezmoi mise fish; do dotfiles_require_command "$command"; done
+  require_chezmoi_source
+  if [ -z "$(configured_chezmoi_source)" ]; then
+    dotfiles_confirm "Adopt $source_dir as the Chezmoi source."
+    chezmoi init --source "$source_dir"
+  fi
+  chezmoi diff --source "$source_dir" --destination "$HOME"
+  dotfiles_confirm "Apply the displayed Chezmoi changes."
+  chezmoi apply --source "$source_dir" --destination "$HOME"
+  mise install
+  mise reshim
+  mise doctor || printf '%s\n' "mise doctor reported diagnostics." >&2
+  printf '%s\n' "Base setup completed. Run script/profile list to view optional profiles."
+}
+
+command=${1:-plan}
+system_upgrade=false
+case "$command" in
+  plan) [ "$#" -eq 1 ] || { usage >&2; exit 2; }; plan ;;
+  apply)
+    shift
+    if [ "${1:-}" = --system-upgrade ]; then system_upgrade=true; shift; fi
+    [ "$#" -eq 0 ] || { usage >&2; exit 2; }
+    apply
+    ;;
+  adopt-source) [ "$#" -eq 1 ] || { usage >&2; exit 2; }; adopt_source ;;
+  *) usage >&2; exit 2 ;;
+esac
